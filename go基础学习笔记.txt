@@ -1,0 +1,207 @@
+为什么要学习Go语言？
+GO语言的优势在于简洁易上手，并且强大的并发处理能力（得益于Goroutine），效率高于Java、Python，并且Google背书。
+像Docker，k8s，etcd等都是Go语言编写的。
+目前Go语言就业在美国国内薪水也超越了Java排名第一。
+
+1. Go中变量声明和赋值的符号说明
+1） “:=” 表示声明并赋值，系统自动判定类型，比如 a := 3；
+2） “=” 必须先用var声明后再赋值，比如var a int; a = 3;
+3)  也可以看出Go中变量定义（变量名 类型）与Java、C是反过来的
+
+2. Go中的空指针
+Go中的空指针为nil,不是null
+
+3. Go数组和切片的声明和赋值
+1）数组的声明和赋值
+var nums [10]float32 声明一个有10个元素的float32类型的数组
+nums = {1,2,3}
+
+2）切片的声明和初始化
+var nums []float32  声明一个float32类型的切片，就相当于Java中List,大小是动态的
+切片需要使用make函数初始化后才能使用：
+nums = make([]float32, len, capacity)
+capacity是当前切片的容量，当元素个数快超过capacity时，使用append时，切片底层会自动扩容，策略是扩充到现在的两倍，len(nums)、cap(nums)分别求切片的长度和容量
+
+3）数组和切片也可以直接声明并赋值：nums := [3]{1,2,3}; nums := [...]{1,2,3} 
+nums：= make([]float32, len, capacity); 
+nums ：= []int{1,2,3} 没有指定长度就是切片，否则就是数组
+
+4) 数组可以转化为切片： qiepian = shuzu[:]
+
+5) Go语言中，数据是值传递的，而切片是传的引用
+
+4. map的声明和使用
+m := map[string]int{"one": 1, "two": 2, "three": 3} 
+m1 := map[string]int{} 
+m1["one"] = 1 
+m2 := make(map[string]int, 10 /*Initial Capacity*/)
+delete(m, "a") 按照key删除一个元素
+v, ok := m["a"]  ok 为 true表示元素存在
+Go语言中没有set，但是可以直接用value为bool类型的map来模拟即可-> m := map[string]bool{}
+
+5. 结构体类似于C语言
+1). 定义
+type User struct {
+	Name    string
+	Age     int
+	address string
+}
+变量首字母为小写则是私有变量，别的包不能访
+
+2）初始化
+直接初始化：
+var user User = User{
+	Name:    "luoji",
+	Age:     29,
+	address: "Chengdu",
+}
+
+使用结构体指针：
+var user *User = &User{
+	Name:    "luoji",
+	Age:     29,
+	address: "Chengdu",
+} 对于结构体指针来说user.Name进行访问时实际上底层用了(*user).Name，和C语言中指针实际是一样的原理
+结构体指针也可以用new关键字来初始化：user := new(User)   user.Name = ....
+
+如果没有对结构体中的字段进行初始化，则为对应类型的默认值，比如字符串就是个空串
+
+2). 结构体是值传递的，如果想要在函数中修改结构体的内部变量值，则需要传入指针
+
+
+6. 常量定义
+const (
+	Readable = 1 << iota
+	Writeable
+	Executable
+)
+其中，iota是一个自增变量，在第一行时为0，第二行为1，第三行为2
+所以结果依次是1 << 0 = 1, 1 << 1 = 2, 1 << 2 = 4
+1 2 4
+
+7. 运算符
+和其它语言差不多，但是：
+1) 只有a++，没有++a
+2) 使用==比较两个数组，如果数组中元素个数、顺序、值都保持一直，则返回true
+3) 比较字符串是否相等可以直接用==
+4）&^是特有的运算符号，表示按位置0，比如3&^1 = 2，表示将3(11)的第1(01)个bit位置0 -> 2(10)
+
+8. if、switch与其它语言差不多使用即可，但是Go支持变量赋值：
+if  var declaration;  condition {      // code to be executed if condition is true }
+condition 表达式结果必须为布尔值
+Go的switch语句不用加break
+
+9. for循环遍历
+1）for i,num := range nums {
+	....
+} nums是一个数组或者切片，如果不想遍历i,则用“_”代替
+
+2) for k,v := range mymap {
+	....
+} k,v分别是map的key和value
+
+3) 同其他语言一样的 for i := 0; i < 3; i++
+
+
+10. interface{}，代表一个类似void*的指针，可以指向任何不同类型的数据
+var f interface{}
+f = 3.25
+if v, ok := f.(float64); ok {
+	t.Log(v, "是float64类型")
+} else {
+	t.Log(v, "是其它类型")
+}
+
+v, ok := f.(float64) 其中f必须是interface{}类型，若ok为true,代表就是float64类型
+
+11. interface
+Go语言的面向对象通过interface实现，但是Go语言没有Java那种继承关系
+如果一个对象看起来是某种接口类型的实现，那么它就可以作为该接口类型使用，这就是Go的面向对象
+即皮卡丘和雷丘都是电老鼠，皮卡丘和雷丘就是电老鼠类型，它们都具有电老鼠的一般特性；可达鸭看起来像鸭子，它就是鸭子类型，具有鸭子的一般特性
+
+12. func
+1) Go语言中函数可以有多个返回值 :func Devide(a int, b int) (int, bool)
+2) 函数可以用作入参和返回值
+3) 函数可以和接口绑定
+func(p Publish) xxx()
+func(p *Publish) xxx()
+其中Publish是一个interface。 这样可以直接使用p.xxx()
+
+13. 字符串
+Go中的字符串是一种数据类型，默认为空串，而不是nil
+len(str)求出的是字符串占用的byte(字节)数量，a-z英文字符占1个字节，但是中文可能占2-3个字节
+字符串遍历和数组遍历一样用range即可
+字符串底层实现时一个[]byte数组，可以用[]byte(s)将字符串s强转为byte数组
+[]rune(s)则是转化为utf8字符集表示
+一个utf8中文字符可能占用是2-3个字节
+
+14.defer
+defer后的东东，在return之前执行
+
+15. %p输出地址，%T输出类型，%v输出数组，切片，结构体； %#v可以输出结构体更详细的信息
+
+16. make和new的区别：make只能为slice,map,channel三种类型分配内存;
+new可以为所有指针类型分配内存
+
+17. Go语言没有异常处理, 一般是在返回值中带上error信息。 
+提供了一个error接口：
+type error interface {
+	Error() string
+}
+通过errors.New可以方便创建一个error对象
+panic 用于不不可以恢复的错误，退出前会执⾏ defer 指定的内容
+os.Exit 退出时不不会调⽤用 defer 指定的函数，退出时不不输出当前调⽤用栈信
+recover一般适用于应用程序全局的未处理错误而不是某个函数。类似于Java异常处理Catch到异常后的处理
+
+
+18. 协程
+1）理解协程
+协程是轻量级的线程，在Go语言中被称为goroutine
+一个goroutine会以一个很小的栈（2K或4K）启动，当遇到深度递归导致当前栈空间不足时，
+goroutine会根据需要动态的提升栈的大小（主流实现最大可到1GB）
+goroutine启动代价小，可以有成千上万个goroutine
+Go语言调度器可以使得在n个操作系统线程上调度m个goroutine,即goroutine和操作系统线程时m:n的关系，而m可以远大于n,这样就大大减少了用户态和内核态和交互，所以提升了并发的性能
+2）协程的顺序一致性
+同一个goroutine A内部，顺序一致性是能得到保证的，但是其它goroutine B看A时，顺序却不一定得到保证。
+比如goroutine A中，a=1 b=2,在另一个goroutine中，两句话不一定谁先谁后
+3）Go中，main函数退出时程序结束，除非在退出前使用了“阻塞”，否则不会等待任何后台线程/协程。
+因为goroutine的执行和main函数返回事件是并发的，谁都可以先发生。
+
+19. Go的连续动态栈
+Go1.4以后采用连续动态栈，即在连续内存中表示一个栈。 连续内存能提高访问效率，
+但是随之而来也引入了新的问题:当连续栈动态增长时，可能需要将之前已经使用过的内存挪动到别的地方，
+这部分数据地址也会随之改变。
+所以，不要在Go中长期保存一个地址并使用它
+
+20. channel
+1）理解channel
+Golang 程序员中有句格言：“不要以共享内存方式通信，要以通信方式共享内存（Don’t communicate by sharing memory, share memory by communicating）
+Go中推荐使用channel来进行goroutine之间的通信
+你可以简单地把 Golang 实现的 CSP 模型类比为生产者 - 消费者模式，而 channel 可以类比为生产者 - 消费者模式中的阻塞队列。不过，需要注意的是 Golang 中 channel 的容量可以是 0，容量为 0 的 channel 在 Golang 中被称为无缓冲的 channel，容量大于 0 的则被称为有缓冲的 channel。
+
+2) channel的使用
+创建一个可以传递bool类型值的无法缓冲channel：var ch = make(chan bool)
+发送 : ch<-true 将true写入channel
+接收 : v := <-ch 
+v,ok := <-ch 可以用第二个参数ok判断信道是否已经关闭，ok为false说明试图读取一个关闭的信道
+无缓冲的channel发送操作总是在接收操作之前完成
+无缓冲channel必须收发配对，否则信道将阻塞，发生死锁。就像快递一样，快递员<->用户。
+
+指定第二个参数则定义有缓冲信道：
+var ch = make(chan bool, 3) 这样就定义了一个缓存大小为3的channel.
+则有cap(ch) = 3
+当缓存满的情况下，才会阻塞向channel中发送数据；同样，只有缓存为空时才会阻塞从channel中接收数据
+
+唯送信道： ch := make(chan<-int) 即只能往信道中发送数据
+唯收信道： ch := make(<-chan int) 即只能从信道中读取数据
+tips:看<-在chan的左边还是右边，在左边就是唯收，右边就是唯送
+意义：函数的入参定义，可以限制唯送或者唯收，但是传入的实际变量可以是双向的
+
+close(ch)关闭一个信道。
+for x := range ch接收信道数时，遇到信道关闭会退出循环。
+
+21. sync.WaitGroup的使用
+var wg sync.WaitGroup
+wg.Add(2) 添加或减少等待的goroutine数量
+wg.Done() 相当于wg.Add(-1)
+wg.Wait() 直到goroutine数量变为0，否则一直阻塞
