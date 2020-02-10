@@ -40,16 +40,17 @@ func TestGoroutineCase2(t *testing.T) {
 
 func TestSelectChannelCase(t *testing.T) {
 	ch := make(chan string)
-	timeout := make(chan string)
-	timeout <- "超时，请检查信道"
-	var msg string
+	go func(chan string) {
+		time.Sleep(101 * time.Millisecond)
+		ch <- "data...data...data"
+	} (ch)
 	select {
-		case msg = <-ch:
-			t.Log("从ch读取到数据")
-		case msg = <-timeout:
-			t.Log("从timeout读取到数据")
-		default:
-			msg = "什么都没找到"
+		case msg := <-ch:
+			t.Log("从ch读取到数据：", msg)
+		case <-time.After(100 * time.Millisecond):
+			t.Log("已超时")
+		// default:
+		// 	t.Log("什么也没找到")
 	}
-	t.Log(msg)
 }
+

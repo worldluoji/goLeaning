@@ -183,7 +183,6 @@ Go中推荐使用channel来进行goroutine之间的通信
 创建一个可以传递bool类型值的无法缓冲channel：var ch = make(chan bool)
 发送 : ch<-true 将true写入channel
 接收 : v := <-ch 
-v,ok := <-ch 可以用第二个参数ok判断信道是否已经关闭，ok为false说明试图读取一个关闭的信道
 无缓冲的channel发送操作总是在接收操作之前完成
 无缓冲channel必须收发配对，否则信道将阻塞，发生死锁。就像快递一样，快递员<->用户。
 
@@ -198,10 +197,21 @@ tips:看<-在chan的左边还是右边，在左边就是唯收，右边就是唯
 意义：函数的入参定义，可以限制唯送或者唯收，但是传入的实际变量可以是双向的
 
 close(ch)关闭一个信道。
-for x := range ch接收信道数时，遇到信道关闭会退出循环。
+for x := range ch接收信道数时，遇到信道关闭会退出循环，否则会不断读取信道中的数据。
+如果信道中没有数据，也没有关闭信道则会阻塞。
+向关闭的信道发送数据会导致panic
+v,ok := <-ch 可以用第二个参数ok判断信道是否已经关闭，ok为false说明信道已经关闭
 
 21. sync.WaitGroup的使用
 var wg sync.WaitGroup
 wg.Add(2) 添加或减少等待的goroutine数量
 wg.Done() 相当于wg.Add(-1)
 wg.Wait() 直到goroutine数量变为0，否则一直阻塞
+
+22. Go语言中也有类似Java中的锁
+互斥锁： var mu sync.Mutex
+mu.Lock() .... mu.UnLock()
+读写锁：var rw sync.RWMutex   
+rw.Lock()/rw.UnLock()就是写锁，上了写锁，读写都是互斥的
+rw.RLock()/rw.RUnLock()就是读锁，读锁读不互斥，写互斥
+读多写少的时候读写锁效率会比较高 
