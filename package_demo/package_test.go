@@ -3,7 +3,7 @@ package package_demo
 import (
 	"fmt"
 	"testing"
-	"package_demo/hello" // 自定义包，要从src下面那一层开始导入
+	"github.com/luoji_demo/package_demo/hello" // 自定义包，要从src下面那一层开始导入
 	cm "github.com/easierway/concurrent_map"
 ) 
 
