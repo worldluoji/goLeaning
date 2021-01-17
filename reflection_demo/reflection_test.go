@@ -82,10 +82,14 @@ func TestInvokeByName(t *testing.T) {
 		t.Error("Fail to get Field")
 	}
 
-	method,ok := reflect.ValueOf(e).MethodByName("UpdateAge")
-	if ok {
-		method.Call([]reflect.Value{reflect.ValueOf(18)})
-	} else {
-		t.Error("Fail to get Method")
-	}
+	// method,ok := reflect.ValueOf(e).MethodByName("UpdateAge")
+	// if ok {
+	// 	method.Call([]reflect.Value{reflect.ValueOf(18)})
+	// } else {
+	// 	t.Error("Fail to get Method")
+	// }
+	 method := reflect.ValueOf(e).MethodByName("UpdateAge")
+	 method.Call([]reflect.Value{reflect.ValueOf(18)})
+	 t.Log("Age: ", e.Age)
+
 }

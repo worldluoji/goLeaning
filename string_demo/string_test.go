@@ -8,6 +8,7 @@ import (
 
 func TestStringIterator(t *testing.T) {
 	ss := "武汉加油加油！！！"
+	t.Log(len(ss), len([]rune(ss)))
 	for _, s := range ss {
 		t.Logf("%[1]c %[1]x", s)
 	}
