@@ -27,6 +27,12 @@ nums：= make([]float32, len, capacity);
 nums ：= []int{1,2,3} 没有指定长度就是切片，否则就是数组
 
 4) 数组可以转化为切片： qiepian = shuzu[:]
+切片实际是一个结构体：
+type slice struct {
+    array unsafe.Pointer //指向存放数据的数组指针
+    len   int            //长度有多大
+    cap   int            //容量有多大
+}
 
 5) Go语言中，数据是值传递的，而切片是传的引用
 
@@ -215,3 +221,6 @@ mu.Lock() .... mu.UnLock()
 rw.Lock()/rw.UnLock()就是写锁，上了写锁，读写都是互斥的
 rw.RLock()/rw.RUnLock()就是读锁，读锁读不互斥，写互斥
 读多写少的时候读写锁效率会比较高 
+
+23.重点注意一下，append()这个函数在 cap 不够用的时候，就会重新分配内存以扩大容量，
+如果够用，就不会重新分配内存了。
