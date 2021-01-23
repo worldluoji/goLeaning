@@ -1,4 +1,4 @@
-package reflection_demo
+package reflection
 
 import (
 	"fmt"
