@@ -1,9 +1,9 @@
 package reflection_demo
 
 import (
-	"testing"
-	"reflect"
 	"fmt"
+	"reflect"
+	"testing"
 )
 
 func TestTypeAndValue(t *testing.T) {
@@ -35,7 +35,6 @@ func TestCheckType(t *testing.T) {
 	CheckType(s)
 }
 
-
 type Customer struct {
 	CookieID string
 	Name     string
@@ -43,8 +42,8 @@ type Customer struct {
 }
 
 func TestDeepEqual(t *testing.T) {
-	m1 := map[int]string{1:"aaa", 2:"bbb", 3:"ccc"}
-	m2 := map[int]string{1:"aaa", 2:"bbb", 3:"ccc"}
+	m1 := map[int]string{1: "aaa", 2: "bbb", 3: "ccc"}
+	m2 := map[int]string{1: "aaa", 2: "bbb", 3: "ccc"}
 	//t.Log(m1 == m2)  map只能和nil做比较
 	t.Log(reflect.DeepEqual(m1, m2))
 
@@ -57,7 +56,7 @@ func TestDeepEqual(t *testing.T) {
 
 	c1 := Customer{"1", "Mike", 40}
 	c2 := Customer{"1", "Mike", 40}
-	t.Log("c1 ==c2?",c1 == c2)
+	t.Log("c1 ==c2?", c1 == c2)
 	t.Log("c1 deep equal c2?", reflect.DeepEqual(c1, c2))
 }
 
@@ -88,8 +87,8 @@ func TestInvokeByName(t *testing.T) {
 	// } else {
 	// 	t.Error("Fail to get Method")
 	// }
-	 method := reflect.ValueOf(e).MethodByName("UpdateAge")
-	 method.Call([]reflect.Value{reflect.ValueOf(18)})
-	 t.Log("Age: ", e.Age)
+	method := reflect.ValueOf(e).MethodByName("UpdateAge")
+	method.Call([]reflect.Value{reflect.ValueOf(18)})
+	t.Log("Age: ", e.Age)
 
 }
