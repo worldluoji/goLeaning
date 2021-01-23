@@ -65,3 +65,26 @@ func TestDecorator2(t *testing.T) {
 	f2 := timedSumFunc(Sum2)
 	fmt.Printf("%d, %d\n", f1(-10000, 10000000), f2(-10000, 10000000))
 }
+
+// decoPtr：完成修饰后的函数， fn：需要修饰的函数
+//  Decorator : reflect.MakeFunc() 函数，创造了一个新的函数，其中的 targetFunc.Call(in) 调用了被修饰的函数。
+func Decorator(decoPtr, fn interface{}) (err error) {
+	var decoratedFunc, targetFunc reflect.Value
+	decoratedFunc = reflect.ValueOf(decoPtr).Elem()
+	targetFunc = reflect.ValueOf(fn)
+	v := reflect.MakeFunc(targetFunc.Type(),
+		func(in []reflect.Value) (out []reflect.Value) {
+			fmt.Println("before...")
+			out = targetFunc.Call(in)
+			fmt.Println("after...")
+			return
+		})
+	decoratedFunc.Set(v)
+	return
+}
+
+func TestDecorator3(t *testing.T) {
+	h := Hello
+	Decorator(&h, Hello)
+	h("Java")
+}
