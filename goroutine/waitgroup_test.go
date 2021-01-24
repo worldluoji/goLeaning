@@ -1,9 +1,9 @@
-package goroutine_demo
+package goroutine
 
 import (
-	"testing"
-	"sync"
 	"fmt"
+	"sync"
+	"testing"
 )
 
 func TestWaitGroupCase1(t *testing.T) {
@@ -14,14 +14,14 @@ func TestWaitGroupCase1(t *testing.T) {
 		go func(num int, wg *sync.WaitGroup) {
 			ch <- num
 			wg.Add(1)
-		} (i, &wg)
+		}(i, &wg)
 	}
 	for i := 0; i < 6; i++ {
 		go func(i int, wg *sync.WaitGroup) {
 			o := <-ch
 			t.Logf("收到的第%d个元素为%d\n", i, o)
 			wg.Done()
-		} (i, &wg)
+		}(i, &wg)
 	}
 	wg.Wait()
 }
@@ -38,7 +38,7 @@ func SimpleProducer(ch chan<- int, count int, wg *sync.WaitGroup) {
 func SimpleReceiver(ch <-chan int, count int, wg *sync.WaitGroup) {
 	// wg.Add(1)
 	for i := 0; i < count; i++ {
-		if o, ok:= <-ch;ok {
+		if o, ok := <-ch; ok {
 			fmt.Printf("收到的第%d个元素为%d\n", i, o)
 		} else {
 			fmt.Println("信道关闭退出")

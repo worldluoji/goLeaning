@@ -9,22 +9,22 @@ import (
 
 var (
 	once     sync.Once
-	instance *IdGenerator
+	instance *IDGenerator
 )
 
-type IdGenerator struct {
+type IDGenerator struct {
 	ID int64
 }
 
-func (idGenerator *IdGenerator) GetAndIncrement() int64 {
+func (idGenerator *IDGenerator) GetAndIncrement() int64 {
 	atomic.AddInt64(&idGenerator.ID, 1)
 	return idGenerator.ID
 }
 
-func GetInstance() *IdGenerator {
+func GetInstance() *IDGenerator {
 	once.Do(func() {
 		fmt.Println("创建单例对象...")
-		instance = &IdGenerator{
+		instance = &IDGenerator{
 			ID: 0,
 		}
 	})

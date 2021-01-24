@@ -25,7 +25,7 @@ func (p *ObjectPool) GetObject(timeout time.Duration) (interface{}, error) {
 	case ret := <-p.bufChan:
 		return ret, nil
 	case <-time.After(timeout):
-		return nil, errors.New("获取对象超时...")
+		return nil, errors.New("获取对象超时")
 	}
 }
 
@@ -34,7 +34,7 @@ func (p *ObjectPool) ReleaseObject(object interface{}) error {
 	case p.bufChan <- object:
 		return nil
 	default:
-		return errors.New("对象池已满...")
+		return errors.New("对象池已满")
 	}
 }
 
