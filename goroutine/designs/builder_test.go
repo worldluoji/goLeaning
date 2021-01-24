@@ -48,3 +48,30 @@ func TestBuilder(t *testing.T) {
 		Build()
 	fmt.Println(server.IP, server.Port, server.Timeout, server.MaxConns)
 }
+
+type Option func(*Server)
+
+func TimeoutOption(timout time.Duration) Option {
+	return func(s *Server) {
+		s.Timeout = timout
+	}
+}
+
+func MaxConnOption(maxConns int) Option {
+	return func(s *Server) {
+		s.MaxConns = maxConns
+	}
+}
+
+func TestBuilderWithFunctional(t *testing.T) {
+	server := Server{
+		IP:       "127.0.0.1",
+		Port:     8090,
+		Timeout:  10 * time.Second,
+		MaxConns: 10,
+	}
+	// 可以用pipline封装，这里不再重复
+	TimeoutOption(6 * time.Second)(&server)
+	MaxConnOption(200)(&server)
+	fmt.Println(server.IP, server.Port, server.Timeout, server.MaxConns)
+}
