@@ -1,12 +1,13 @@
-package package_demo
+package pkgtest
 
 import (
 	"fmt"
 	"testing"
-	"github.com/luoji_demo/package_demo/hello" // 自定义包，要从src下面那一层开始导入
-	cm "github.com/easierway/concurrent_map"
-) 
 
+	// 自定义和第三方包，绝对路径要从src下面那一层开始导入github.com/luoji_demo/package_demo
+	cm "github.com/concurrent_map"
+	"github.com/luoji_demo/pkgtest/hello"
+)
 
 func init() {
 	fmt.Println("package init1...")
@@ -20,7 +21,6 @@ func TestPackageImportCase1(t *testing.T) {
 	hello.Hello()
 	// 只有首字母大写的方法才能被调用
 }
-
 
 func TestPackageImportCase2(t *testing.T) {
 	m := cm.CreateConcurrentMap(10)
