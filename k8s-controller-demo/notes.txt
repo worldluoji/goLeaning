@@ -1,0 +1,29 @@
+1. 提示 Hit an unsupported type invalid type的同学，可以先安装下k8s.io/apimachinery包。
+应该是deepcopy找不到metav1.ObjectMeta和metav1.TypeMeta
+go get -u k8s.io/apimachinery
+这其实是去github https://github.com/kubernetes/apimachinery 进行下载，
+如果速度过慢，可以使用加速器：
+
+2. 开发一个k8s Controller的步骤：
+1） 定义对象（比如例子里定义了一个NetWork对象） 
+第一部分是，自定义资源类型的 API 描述，包括：组（Group）、版本（Version）、资源类型（Resource）等。这相当于告诉了计算机：兔子是哺乳动物。
+第二部分是，自定义资源类型的对象描述，包括：Spec、Status 等。这相当于告诉了计算机：兔子有长耳朵和三瓣嘴。
+
+2） 生成代码
+我就要使用 Kubernetes 提供的代码生成工具，为上面定义的 Network 资源类型自动生成 clientset、informer 和 lister。
+其中，clientset 就是操作 Network 对象所需要使用的客户端。
+这个代码生成工具名叫k8s.io/code-generator
+
+# 代码生成的工作目录，也就是我们的项目路径
+$ ROOT_PACKAGE="github.com/resouer/k8s-controller-custom-resource"
+# API Group
+$ CUSTOM_RESOURCE_NAME="samplecrd"
+# API Version
+$ CUSTOM_RESOURCE_VERSION="v1"
+
+# 安装k8s.io/code-generator
+$ go get -u k8s.io/code-generator/...
+$ cd $GOPATH/src/k8s.io/code-generator
+
+# 执行代码自动生成，其中pkg/client是生成目标目录，pkg/apis是类型定义目录
+$ ./generate-groups.sh all "$ROOT_PACKAGE/pkg/client" "$ROOT_PACKAGE/pkg/apis" "$CUSTOM_RESOURCE_NAME:$CUSTOM_RESOURCE_VERSION"
