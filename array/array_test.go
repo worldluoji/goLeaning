@@ -1,7 +1,10 @@
 package array
 
-import "testing"
-import "sort"
+import (
+	"fmt"
+	"sort"
+	"testing"
+)
 
 // $ go test -v array_test.go
 // === RUN   TestArrayDeclaration
@@ -22,21 +25,21 @@ func TestArrayDeclaration(t *testing.T) {
 }
 
 func TestSliceAppend(t *testing.T) {
-	a := []int{1,2,3,4,5,6}
+	a := []int{1, 2, 3, 4, 5, 6}
 	a = append(a[:3], a[4:]...) // 删除第三个元素
 	t.Log("删除第三个元素后的数组：", a)
 	a = append(a, 7)
-	a = append(a, []int{8,9,10}...)
+	a = append(a, []int{8, 9, 10}...)
 	t.Log("在末尾添加元素后后的数组：", a)
 	a = append(a, 0)
 	copy(a[4:], a[3:]) // a[4:]用a[3:]赋值
 	t.Log("在第三个位置添加元素后的数组：", a)
-	a[3] = 4;
+	a[3] = 4
 	t.Log("在第三个位置添加元素后的数组：", a)
 }
 
 func TestSortIntSlice(t *testing.T) {
-	sl := []int{3,1,2,5,6,4}
+	sl := []int{3, 1, 2, 5, 6, 4}
 	sort.Sort(sort.IntSlice(sl))
 	t.Log("正序排序：", sl)
 	sort.Sort(sort.Reverse(sort.IntSlice(sl)))
@@ -46,9 +49,27 @@ func TestSortIntSlice(t *testing.T) {
 }
 
 func TestSortStringSlice(t *testing.T) {
-	sl := []string{"a","e","b","d","c","p"}
+	sl := []string{"a", "e", "b", "d", "c", "p"}
 	sort.Strings(sl)
 	t.Log("正序排序：", sl)
 	sort.Sort(sort.Reverse(sort.StringSlice(sl)))
 	t.Log("逆序排序：", sl)
+}
+
+func changeSlice(a []int, i int, newVal int) {
+	a[i] = newVal
+}
+
+func changeArray(a [3]int, i int, newVal int) {
+	a[i] = newVal
+}
+
+func TestChangeArray(t *testing.T) {
+	a := []int{1, 2, 3}
+	changeSlice(a, 0, 6)
+	fmt.Println(a)
+
+	b := [3]int{1, 2, 3}
+	changeArray(b, 0, 6)
+	fmt.Println(b)
 }
