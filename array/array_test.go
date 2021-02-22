@@ -18,7 +18,9 @@ func TestArrayDeclaration(t *testing.T) {
 	a1 := [...]int{1, 2, 3}
 	a2 := [5]int{1, 2, 5}
 	a3 := []int{5, 6, 7} // 未指定长度，是一个切片
+	t.Logf("%T", a1)
 	t.Log(a1)
+	t.Logf("%T", a2)
 	t.Log(a2)
 	t.Log(a3)
 	t.Logf("%T", a3)
@@ -36,6 +38,13 @@ func TestSliceAppend(t *testing.T) {
 	t.Log("在第三个位置添加元素后的数组：", a)
 	a[3] = 4
 	t.Log("在第三个位置添加元素后的数组：", a)
+}
+
+func TestSliceAppend2(t *testing.T) {
+	a := []int{1, 2, 3, 4, 5, 6}
+	b := append(a, 7)
+	fmt.Println(a)
+	fmt.Println(b)
 }
 
 func TestSortIntSlice(t *testing.T) {
@@ -64,6 +73,9 @@ func changeArray(a [3]int, i int, newVal int) {
 	a[i] = newVal
 }
 
+/*
+	数组传入函数是副本，切片则是对应的地址
+*/
 func TestChangeArray(t *testing.T) {
 	a := []int{1, 2, 3}
 	changeSlice(a, 0, 6)
@@ -72,4 +84,18 @@ func TestChangeArray(t *testing.T) {
 	b := [3]int{1, 2, 3}
 	changeArray(b, 0, 6)
 	fmt.Println(b)
+
+	fmt.Println(b[3:])
+}
+
+func TestArrayEqual(t *testing.T) {
+	a := [3]int{1, 2, 3}
+	b := [3]int{1, 2, 3}
+	fmt.Println(a == b)
+	fmt.Println(&a == &b)
+
+	c := []int{1, 2, 3}
+	d := []int{1, 2, 3}
+	// fmt.Println(c == d) error
+	fmt.Println(&c == &d)
 }

@@ -1,6 +1,10 @@
-package slice_demo
+package slicetest
 
-import "testing"
+import (
+	"fmt"
+	"reflect"
+	"testing"
+)
 
 func TestArrayToSlice1(t *testing.T) {
 	a1 := [...]int{1, 2, 3}
@@ -48,4 +52,10 @@ func TestArrayToSlice4(t *testing.T) {
 	s1[0] = 5
 	t.Log(a1, len(a1), cap(a1))
 	t.Log(s1, len(s1), cap(s1))
+}
+
+func TestArrayToSliceEqual(t *testing.T) {
+	s1 := []int{1, 2, 3}
+	s2 := []int{1, 2, 3}
+	fmt.Println(reflect.DeepEqual(s1, s2))
 }
