@@ -3,6 +3,7 @@ package slicetest
 import (
 	"fmt"
 	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -68,4 +69,105 @@ func TestArrayToSliceAppend(t *testing.T) {
 	fmt.Println(s1, len(s1), cap(s1))
 	fmt.Println(s2, len(s2), cap(s2))
 	fmt.Println(s3, len(s3), cap(s3))
+}
+
+func TestNSum(t *testing.T) {
+	nums := []int{2, -4, -5, -2, -3, -5, 0, 4, -2}
+	sort.Ints(nums)
+	target := -14
+	res := fourSum(&nums, target)
+	fmt.Println(res)
+
+}
+
+func fourSum(nums *[]int, target int) [][]int {
+	if len(*nums) < 4 {
+		return make([][]int, 0)
+	}
+	sort.Ints(*nums)
+	res := make([][]int, 0)
+	numSelected := map[int]bool{}
+	for index, num := range *nums {
+		if index > 0 && num == (*nums)[index-1] {
+			continue
+		}
+		if numSelected[num] {
+			continue
+		}
+		t := append(append([]int{}, (*nums)[0:index]...), (*nums)[index+1:]...)
+		tmp := threeSum(&t, target-num)
+		for _, v := range tmp {
+			if !numSelected[v[0]] && !numSelected[v[1]] && !numSelected[v[2]] {
+				res = append(res, append(v, num))
+			}
+		}
+		numSelected[num] = true
+	}
+	return res
+}
+
+// 找三数之和等于target的所有解，不能重复
+func threeSum(nums *[]int, target int) [][]int {
+	var res [][]int
+	numSelected := map[int]bool{}
+	for index, num := range *nums {
+		if index > 0 && num == (*nums)[index-1] {
+			continue
+		}
+		if numSelected[num] {
+			continue
+		}
+
+		t := append(append([]int{}, (*nums)[0:index]...), (*nums)[index+1:]...)
+		tmp := twoSum(t, target-num)
+		for _, v := range tmp {
+			// 关键 另外两个数都没有被选过，才可以，否则会重复。因为只要前面有一个数被选过，它就可以找到对应的解了
+			if !numSelected[v[0]] && !numSelected[v[1]] {
+				res = append(res, append(v, num))
+				numSelected[num] = true
+			}
+		}
+	}
+	return res
+}
+
+// 找两数之和为target的所有解，不能重复
+func twoSum(nums []int, target int) [][]int {
+	i := 0
+	j := len(nums) - 1
+	var res [][]int
+	for {
+		for {
+			if i > 0 && i <= len(nums)-1 && nums[i] == nums[i-1] {
+				i++
+			} else {
+				break
+			}
+		}
+
+		for {
+			if j < len(nums)-2 && j >= 0 && nums[j] == nums[j+1] {
+				j--
+			} else {
+				break
+			}
+		}
+
+		if i >= j {
+			break
+		}
+
+		total := nums[i] + nums[j]
+		if total == target {
+			r := []int{nums[i], nums[j]}
+			res = append(res, r)
+			j--
+			i++
+		} else if total > target {
+			j--
+		} else {
+			i++
+		}
+	}
+	return res
 }
