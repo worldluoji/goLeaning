@@ -113,3 +113,17 @@ Envoy如果复杂的配置，都能干什么事呢？
 如果我们的应用能够意识不到服务治理的存在，就可以直接进行 GRPC 的调用。
 这就是未来服务治理的趋势 Serivce Mesh，也即应用之间的相互调用全部由 Envoy 进行代理，
 服务之间的治理也被 Envoy 进行代理，完全将服务治理抽象出来，到平台层解决。
+
+7. protobuf代码生成
+1）先从官网下载对应操作系统的的protoc工具，并配置到环境变量中。
+https://github.com/protocolbuffers/protobuf/releases
+2）你会发现工具中并没有go语言，但是有Java,JS,C++等等。
+这时候可以go get github.com/golang/protobuf/protoc-gen-go
+于是在GOPATH的bin目录会多一个protoc-gen-go.exe
+这一步有可能会因为网络原因没法执行，可以从
+https://github.com/golang/protobuf
+下载源码，将protobuf下的内容，放到GOPATH的src/github.com/golang/protobuf里，然后
+进入protoc-gen-go目录，执行go install，这样GOPATH的bin目录会多一个protoc-gen-go.exe。
+3）执行 protoc --go_out=. *.proto
+注意要把protoc-gen-go.exe也加入到环境变量。
+生成文件若导入包有缺失，可以到这里下载https://github.com/protocolbuffers/protobuf-go
