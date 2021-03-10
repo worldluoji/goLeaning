@@ -237,3 +237,5 @@ rw.RLock()/rw.RUnLock()就是读锁，读锁读不互斥，写互斥
 对于在 for-loop 里的固定的正则表达式，一定要使用 regexp.Compile() 编译正则表达式。性能会提升两个数量级。
 如果你需要更高性能的协议，就要考虑使用 protobuf 或 msgp 而不是 JSON，因为 JSON 的序列化和反序列化里使用了反射。
 你在使用 Map 的时候，使用整型的 key 会比字符串的要快，因为整型比较比字符串比较要快。
+
+25. go get 下载超时，则使用Go代理 https://goproxy.io/zh/docs/getting-started.html

@@ -1,4 +1,5 @@
 package v1
+
 /*
 “registry”的作用就是注册一个类型（Type）给 APIServer。
 其中，Network 资源类型在服务器端注册的工作，APIServer 会自动帮我们完成。
@@ -12,7 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	"github.com/resouer/k8s-controller-custom-resource/pkg/apis/samplecrd"
+	"github.com/luoji_demo/k8s-controller-demo/pkg/apis/samplecrd"
 )
 
 // GroupVersion is the identifier for the API which includes
@@ -52,4 +53,5 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil
 }
+
 // 有了这个方法，Kubernetes 就能够在后面生成客户端的时候，“知道”Network 以及 NetworkList 类型的定义了。
