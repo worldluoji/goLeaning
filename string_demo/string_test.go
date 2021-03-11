@@ -52,3 +52,11 @@ func TestStringConvert(t *testing.T) {
 		t.Log(b)
 	}
 }
+
+func TestChangeString(t *testing.T) {
+	s := "hello world"
+	s1 := string('a') + s[1:]
+	t.Log(s[0], 'h')
+	t.Log(s, s[0] == 'h')
+	t.Log(s1)
+}
