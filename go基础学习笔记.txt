@@ -239,3 +239,12 @@ rw.RLock()/rw.RUnLock()就是读锁，读锁读不互斥，写互斥
 你在使用 Map 的时候，使用整型的 key 会比字符串的要快，因为整型比较比字符串比较要快。
 
 25. go get 下载超时，则使用Go代理 https://goproxy.io/zh/docs/getting-started.html
+
+26. log.Fatal会调用ox.Exit, 导致程序退出，并且defer里内容也不会执行。所以一般仅用于main函数里和init初始
+化函数里。
+
+27. goutine使用的3个要点
+1）调用一个函数，应该由调用者决定是否启动一个goroutine，而不是在函数内部去启动一个goroutine,
+即谁去用，则谁启动goroutine;
+2）启动了一个goroutine,应该知道这个gotoutine什么时候结束;
+3）要能够管控一个goroutine什么时候退出，无论是用channel还是context超时退出。
