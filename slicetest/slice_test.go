@@ -1,6 +1,7 @@
 package slicetest
 
 import (
+	"container/list"
 	"fmt"
 	"reflect"
 	"sort"
@@ -69,6 +70,19 @@ func TestArrayToSliceAppend(t *testing.T) {
 	fmt.Println(s1, len(s1), cap(s1))
 	fmt.Println(s2, len(s2), cap(s2))
 	fmt.Println(s3, len(s3), cap(s3))
+}
+
+func TestGoList(t *testing.T) {
+	l := list.New()
+	l.PushBack(4)
+	l.PushBack(5)
+	l.PushBack(6)
+	l.PushBack(7)
+	l.PushBack(17)
+	t.Log(l.Back().Value)
+	t.Log(l.Front().Value)
+	l.Remove(l.Back())
+	t.Log(l.Back().Value)
 }
 
 func TestNSum(t *testing.T) {
