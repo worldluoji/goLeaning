@@ -53,10 +53,15 @@ func TestStringConvert(t *testing.T) {
 	}
 }
 
+// 可以看出，字符串的一个元素就是一个uint8类型
 func TestChangeString(t *testing.T) {
-	s := "hello world"
+	s := "{hello world"
 	s1 := string('a') + s[1:]
+	t.Logf("%T", s[0])
 	t.Log(s[0], 'h')
 	t.Log(s, s[0] == 'h')
 	t.Log(s1)
+	var c = '}'
+	var d = '{'
+	t.Log(c, d)
 }
