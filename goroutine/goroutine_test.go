@@ -13,18 +13,21 @@ func hello(msg string) {
 func TestGoroutineCase1(t *testing.T) {
 	//在新的协程中执行hello方法
 	go hello("World")
-	//等待100毫秒让协程执行结束
+	//等待100毫秒让协程执行结束, 否则可能退出后，goroutine还没有结束
 	time.Sleep(100 * time.Millisecond)
 }
 
+// 在容量为C的channel上的第k个接收先行发生于从这个channel上的第k+C次发送完成。
 func TestGoroutineCase2(t *testing.T) {
 	start := time.Now()
-	ch := make(chan int, 3)
+	ch := make(chan int, 2)
 	for i := 0; i < 6; i++ {
 		go func(num int) {
 			ch <- num
+			t.Logf("发送第%d个元素\n", num)
 		}(i)
 	}
+	// 该例子可以看到，接收的顺序，不一定就是发送的顺序。
 	for i := 0; i < 6; i++ {
 		go func(i int) {
 			o := <-ch
@@ -34,6 +37,34 @@ func TestGoroutineCase2(t *testing.T) {
 	elapse := time.Since(start)
 	t.Log("耗时时间为：", elapse)
 	time.Sleep(100 * time.Millisecond)
+}
+
+var cht = make(chan int)
+var a string
+
+func setVal() {
+	a = "hello golang"
+	cht <- 9
+}
+
+func TestGoroutineCase3(t *testing.T) {
+	go setVal()
+	<-cht
+	// 无缓冲channel的接收先行发生于发送完成，因此能正确打印出hello golang
+	fmt.Println(a)
+}
+
+func setVal2() {
+	a = "hello golang2"
+	close(cht)
+}
+
+// 对channel的关闭先行发生于接收到值，因为channel已经被关闭了
+func TestGoroutineCase4(t *testing.T) {
+	go setVal2()
+	<-cht
+	// channel接收一定在发送之前，因此能正确打印出hello golang
+	fmt.Println(a)
 }
 
 func TestSelectChannelCase(t *testing.T) {

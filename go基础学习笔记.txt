@@ -181,7 +181,7 @@ Go1.4以后采用连续动态栈，即在连续内存中表示一个栈。 连�
 
 20. channel
 1）理解channel
-Golang 程序员中有句格言：“不要以共享内存方式通信，要以通信方式共享内存（Don’t communicate by sharing memory, share memory by communicating）
+Golang 程序员中有句格言：不要以共享内存方式通信，要以通信方式共享内存（Don’t communicate by sharing memory, share memory by communicating）
 Go中推荐使用channel来进行goroutine之间的通信
 你可以简单地把 Golang 实现的 CSP 模型类比为生产者 - 消费者模式，而 channel 可以类比为生产者 - 消费者模式中的阻塞队列。不过，需要注意的是 Golang 中 channel 的容量可以是 0，容量为 0 的 channel 在 Golang 中被称为无缓冲的 channel，容量大于 0 的则被称为有缓冲的 channel。
 
@@ -196,6 +196,22 @@ Go中推荐使用channel来进行goroutine之间的通信
 var ch = make(chan bool, 3) 这样就定义了一个缓存大小为3的channel.
 则有cap(ch) = 3
 当缓存满的情况下，才会阻塞向channel中发送数据；同样，只有缓存为空时才会阻塞从channel中接收数据
+在容量为C的channel上的第k个接收先行发生于从这个channel上的第k+C次发送完成.
+可以通过带缓冲的channel来实现计数信号量：channel中的元素数量对应着活动的数量，
+channel的容量表示同时活动的最大数量，发送元素获取信号量，接收元素释放信号量，这是限制并发的通常用法。
+var limit = make(chan int, 3)
+func main() {
+    for _, w := range work {   
+         go func(w func()) {
+            limit <- 1
+            w()
+            <-limit
+        }(w)
+    }
+    select{}
+}
+这些goroutine通过有限制的channel来确保最多同时执行三个工作函数（w）
+更建议使用sync.WaitGroup
 
 唯送信道： ch := make(chan<-int) 即只能往信道中发送数据
 唯收信道： ch := make(<-chan int) 即只能从信道中读取数据
