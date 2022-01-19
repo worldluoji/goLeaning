@@ -1,12 +1,13 @@
-package main
+package error_demo
 
 import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
+	"testing"
 )
 
-// 长度不够，少一个Weight
+// 长度不够，少一个Weight，这里只有11个字节，但是Person结构体，有12个字节， 1字节=8bit
 var b = []byte{0x48, 0x61, 0x6f, 0x20, 0x43, 0x68, 0x65, 0x6e, 0x00, 0x00, 0x2c}
 var r = bytes.NewReader(b)
 
@@ -20,6 +21,7 @@ type Person struct {
 
 func (p *Person) read(data interface{}) {
 	if p.err == nil {
+		// 按照大端序，从r中读取内容，写到data中
 		p.err = binary.Read(r, binary.BigEndian, data)
 	}
 }
@@ -43,8 +45,8 @@ func (p *Person) Print() *Person {
 	return p
 }
 
-func main() {
+func TestErrorIOC(t *testing.T) {
 	p := Person{}
 	p.ReadName().ReadAge().ReadWeight().Print()
-	fmt.Println(p.err) // EOF 错误
+	t.Log(p.err) // EOF 错误
 }

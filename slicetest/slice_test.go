@@ -48,7 +48,14 @@ func TestArrayToSlice4(t *testing.T) {
 	a1[1] = 2
 	a1[2] = 3
 	t.Log(a1, len(a1), cap(a1))
-	s1 := a1[:3:3] //full slice expression，append仍然导致内存分配
+	s1 := a1[:3:3] //full slice expression，由于减少了capacity，append仍然导致内存分配
+	/*
+	 * a[low : high : max]
+	 * constructs a slice of the same type, and with the same length and elements
+	 * as the simple slice expression a[low : high].
+	 * Additionally, it controls the resulting slice’s capacity by setting it to max - low.
+	 * Only the first index may be omitted; it defaults to 0. After slicing the array a
+	 */
 	t.Log(s1, len(s1), cap(s1))
 	s1 = append(s1, 6)
 	s1[0] = 5
