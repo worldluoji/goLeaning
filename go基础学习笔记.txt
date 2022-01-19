@@ -20,7 +20,8 @@ nums = {1,2,3}
 var nums []float32  声明一个float32类型的切片，就相当于Java中List,大小是动态的
 切片需要使用make函数初始化后才能使用：
 nums = make([]float32, len, capacity)
-capacity是当前切片的容量，当元素个数快超过capacity时，使用append时，切片底层会自动扩容，策略是扩充到现在的两倍，len(nums)、cap(nums)分别求切片的长度和容量
+capacity是当前切片的容量，当元素个数快超过capacity时，使用append时，切片底层会自动扩容，
+策略是扩充到现在的两倍，len(nums)、cap(nums)分别求切片的长度和容量
 
 3）数组和切片也可以直接声明并赋值：nums := [3]{1,2,3}; nums := [...]{1,2,3} 
 nums：= make([]float32, len, capacity); 
@@ -90,7 +91,16 @@ const (
 1) 只有a++，没有++a
 2) 使用==比较两个数组，如果数组中元素个数、顺序、值都保持一致，则返回true
 3) 比较字符串是否相等可以直接用==
-4）&^是特有的运算符号，表示按位置0，比如3&^1 = 2，表示将3(11)的第1(01)个bit位置0 -> 2(10)
+4）&^是特有的运算符号，&^ 运算符叫做 AND NOT。它是一个 使用 AND 后，再使用 NOT 操作的简写。
+比如3&^1 = 2，表示将3(11) & 1(01) = 01，再NOT bit反转 -> 2(10)
+位运算：
+&    位与
+|    位或
+^    异或
+&^   位与非
+<<   左移
+>>   右移
+
 
 8. if、switch与其它语言差不多使用即可，但是Go支持变量赋值：
 if  var declaration;  condition {      // code to be executed if condition is true }
@@ -123,7 +133,8 @@ v, ok := f.(float64) 其中f必须是interface{}类型，若ok为true,代表就�
 11. interface
 Go语言的面向对象通过interface实现，但是Go语言没有Java那种继承关系
 如果一个对象看起来是某种接口类型的实现，那么它就可以作为该接口类型使用，这就是Go的面向对象
-即皮卡丘和雷丘都是电老鼠，皮卡丘和雷丘就是电老鼠类型，它们都具有电老鼠的一般特性；可达鸭看起来像鸭子，它就是鸭子类型，具有鸭子的一般特性
+即皮卡丘和雷丘都是电老鼠，皮卡丘和雷丘就是电老鼠类型，它们都具有电老鼠的一般特性；
+可达鸭看起来像鸭子，它就是鸭子类型，具有鸭子的一般特性
 
 12. func
 1) Go语言中函数可以有多个返回值 :func Devide(a int, b int) (int, bool)
@@ -166,24 +177,27 @@ recover一般适用于应用程序全局的未处理错误而不是某个函数�
 一个goroutine会以一个很小的栈（2K或4K）启动，当遇到深度递归导致当前栈空间不足时，
 goroutine会根据需要动态的提升栈的大小（主流实现最大可到1GB）
 goroutine启动代价小，可以有成千上万个goroutine
-Go语言调度器可以使得在n个操作系统线程上调度m个goroutine,即goroutine和操作系统线程时m:n的关系，而m可以远大于n,这样就大大减少了用户态和内核态和交互，所以提升了并发的性能
+Go语言调度器可以使得在n个操作系统线程上调度m个goroutine,即goroutine和操作系统线程时m:n的关系，
+而m可以远大于n,这样就大大减少了用户态和内核态和交互，所以提升了并发的性能
 2）协程的顺序一致性
 同一个goroutine A内部，顺序一致性是能得到保证的，但是其它goroutine B看A时，顺序却不一定得到保证。
 比如goroutine A中，a=1 b=2,在另一个goroutine中，两句话不一定谁先谁后
-3）Go中，main函数退出时程序结束，除非在退出前使用了“阻塞”，否则不会等待任何后台线程/协程。
-因为goroutine的执行和main函数返回事件是并发的，谁都可以先发生。
+3）Go中，main函数退出时程序结束，除非在退出前使用了“阻塞”，否则不会等待任何后台线程/协程
+因为goroutine的执行和main函数返回事件是并发的，谁都可以先发生
 
 19. Go的连续动态栈
 Go1.4以后采用连续动态栈，即在连续内存中表示一个栈。 连续内存能提高访问效率，
 但是随之而来也引入了新的问题:当连续栈动态增长时，可能需要将之前已经使用过的内存挪动到别的地方，
 这部分数据地址也会随之改变。
-所以，不要在Go中长期保存一个地址并使用它
+所以，不要在Go中长期保存一个地址并使用它。
 
 20. channel
 1）理解channel
-Golang 程序员中有句格言：不要以共享内存方式通信，要以通信方式共享内存（Don’t communicate by sharing memory, share memory by communicating）
+Go 程序员中有句格言：不要以共享内存方式通信，要以通信方式共享内存（Don’t communicate by sharing memory, share memory by communicating）
 Go中推荐使用channel来进行goroutine之间的通信
-你可以简单地把 Golang 实现的 CSP 模型类比为生产者 - 消费者模式，而 channel 可以类比为生产者 - 消费者模式中的阻塞队列。不过，需要注意的是 Golang 中 channel 的容量可以是 0，容量为 0 的 channel 在 Golang 中被称为无缓冲的 channel，容量大于 0 的则被称为有缓冲的 channel。
+你可以简单地把 Go 实现的 CSP 模型类比为生产者 - 消费者模式，而 channel 可以类比为生产者 - 消费者模式中的阻塞队列。
+不过，需要注意的是 Go 中 channel 的容量可以是 0，容量为 0 的 channel 在 Go 中被称为无缓冲的 channel，
+容量大于 0 的则被称为有缓冲的 channel。
 
 2) channel的使用
 创建一个可以传递bool类型值的无法缓冲channel：var ch = make(chan bool)
@@ -197,6 +211,7 @@ var ch = make(chan bool, 3) 这样就定义了一个缓存大小为3的channel.
 则有cap(ch) = 3
 当缓存满的情况下，才会阻塞向channel中发送数据；同样，只有缓存为空时才会阻塞从channel中接收数据
 在容量为C的channel上的第k个接收先行发生于从这个channel上的第k+C次发送完成.
+（举个例子，容量为3，那么发的第1个包，一定比第4个早发送完成，但不保证第1个包和第2个包谁先谁后）
 可以通过带缓冲的channel来实现计数信号量：channel中的元素数量对应着活动的数量，
 channel的容量表示同时活动的最大数量，发送元素获取信号量，接收元素释放信号量，这是限制并发的通常用法。
 var limit = make(chan int, 3)
