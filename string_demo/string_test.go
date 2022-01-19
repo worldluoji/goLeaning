@@ -65,3 +65,32 @@ func TestChangeString(t *testing.T) {
 	var d = '{'
 	t.Log(c, d)
 }
+
+func TestStringToMap(t *testing.T) {
+	ss := "weitong"
+	mp := map[uint8]int{}
+	for _, s := range ss {
+		t.Log(s)
+		mp[uint8(s)]++
+	}
+	for k, v := range mp {
+		t.Log(k, v)
+	}
+
+	t.Log(ss[0:2], len(ss[0:0]), nil)
+	t.Logf("%T", ss[0:2])
+	res := findNthDigit(100)
+	t.Log(res)
+}
+
+func findNthDigit(n int) int {
+	var ss strings.Builder
+	for num := 1; ; num++ {
+		ss.WriteString(strconv.Itoa(num))
+		lens := len(ss.String())
+		if lens >= n {
+			res, _ := strconv.Atoi(string((ss.String())[lens-1]))
+			return res
+		}
+	}
+}
