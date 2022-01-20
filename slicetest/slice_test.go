@@ -61,6 +61,9 @@ func TestArrayToSlice4(t *testing.T) {
 	s1[0] = 5
 	t.Log(a1, len(a1), cap(a1))
 	t.Log(s1, len(s1), cap(s1))
+
+	s2 := a1[0:0]
+	t.Log(s2)
 }
 
 func TestArrayToSliceEqual(t *testing.T) {

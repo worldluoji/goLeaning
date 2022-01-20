@@ -53,6 +53,19 @@ func TestStringConvert(t *testing.T) {
 	}
 }
 
+func TestReverseString(t *testing.T) {
+	src := "你好abc李焕英"
+	dst := reverse([]rune(src))
+	t.Logf("%v\n", string(dst))
+}
+
+func reverse(s []rune) string {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
+	return string(s)
+}
+
 // 可以看出，字符串的一个元素就是一个uint8类型
 func TestChangeString(t *testing.T) {
 	s := "{hello world"

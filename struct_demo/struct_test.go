@@ -31,6 +31,7 @@ func TestCreateAndInitStructCase2(t *testing.T) {
 
 func TestCreateAndInitStructCase3(t *testing.T) {
 	user := new(User)
+	t.Log(user.Name, user.Age, user.address)
 	user.Name = "luoji"
 	user.Age = 29
 	user.address = "Chendu"

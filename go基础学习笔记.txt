@@ -69,7 +69,7 @@ var user *User = &User{
 	Age:     29,
 	address: "Chengdu",
 } 对于结构体指针来说user.Name进行访问时实际上底层用了(*user).Name，和C语言中指针实际是一样的原理
-结构体指针也可以用new关键字来初始化：user := new(User)   user.Name = ....
+结构体指针也可以用new关键字来初始化：user := new(User), new出来的是指针   user.Name = ....
 
 如果没有对结构体中的字段进行初始化，则为对应类型的默认值，比如字符串就是个空串
 
