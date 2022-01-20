@@ -89,6 +89,7 @@ func echo(nums []int) <-chan int {
 		for _, n := range nums {
 			out <- n
 		}
+		// 发送到信道完了以后，要关闭信道，否则接收方会阻塞；你关闭信道后，接收方仍然可以从信道中取到数据
 		close(out)
 	}()
 	return out
