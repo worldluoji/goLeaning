@@ -95,6 +95,28 @@ func TestGoList(t *testing.T) {
 	t.Log(l.Back().Value)
 }
 
+func Test2DimensionArray(t *testing.T) {
+	const m = 2
+	const n = 3
+	aa := [m][n]int{} // m、n必须是常量，否则会报错
+	aa[1][1] = 1
+	aa[0][2] = 1
+	t.Log(aa)
+
+	row := 2
+	col := 3
+	// 动态二维数据
+	var arr [][]int
+	for x := 0; x < row; x++ {  //循环为一维长度
+		ar := make([]int, col) //创建一个一维切片
+		arr = append(arr, ar)    //把一维切片,当作一个整体传入二维切片中
+	}
+	arr[1][2] = 1
+	t.Log(arr)
+}
+
+
+
 func TestNSum(t *testing.T) {
 	nums := []int{2, -4, -5, -2, -3, -5, 0, 4, -2}
 	sort.Ints(nums)
