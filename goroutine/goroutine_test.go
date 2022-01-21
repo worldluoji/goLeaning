@@ -67,15 +67,29 @@ func TestGoroutineCase4(t *testing.T) {
 	fmt.Println(a)
 }
 
+/*
+* 当多个协程同时运行时，可通过 select 轮询多个通道
+• 如果所有通道都阻塞则等待，如定义了 default 则执行 default
+• 如多个通道就绪则随机选择一个
+*/
 func TestSelectChannelCase(t *testing.T) {
 	ch := make(chan string)
+	ch2 := make(chan string)
 	go func(chan string) {
 		time.Sleep(101 * time.Millisecond)
 		ch <- "data...data...data"
 	}(ch)
+
+	go func(chan string) {
+		time.Sleep(99 * time.Millisecond)
+		ch2 <- "data2...data2...data2"
+	}(ch)
+
 	select {
 	case msg := <-ch:
 		t.Log("从ch读取到数据：", msg)
+	case msg := <-ch2:
+		t.Log("从ch2读取到数据：", msg)
 	case <-time.After(100 * time.Millisecond):
 		t.Log("已超时")
 		// default:
