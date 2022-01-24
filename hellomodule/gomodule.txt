@@ -54,6 +54,18 @@ go: downloading github.com/go-redis/redis/v7 v7.4.1
 go: downloading github.com/go-redis/redis v6.15.9+incompatible
 go get: added github.com/go-redis/redis/v7 v7.4.1
 
+Go 程序的入口函数只能是 main，这是 Go 语言的要求.
+有了 Go Module 构建模式后，Go 项目可以放在任意目录，不一定要放在GOPATH下。
+
+go mod tidy 不区分私有 Go Module 还是公共 Go Module，只要满足Go Module proxy 的下载协议，
+就可以从中拉取依赖包。
+
+极客时间版权所有: https://time.geekbang.org/quiz/question?sheet_id=368513&quiz_id=60705
+
+极客时间版权所有: https://time.geekbang.org/quiz/question?sheet_id=368513&quiz_id=60705
+
+极客时间版权所有: https://time.geekbang.org/quiz/question?sheet_id=368513&quiz_id=60705
+
 Go 是一种编译型语言，这意味着只有你编译完 Go 程序之后，才可以将生成的可执行文件交付于其他人，
 并运行在没有安装 Go 的环境中。
 

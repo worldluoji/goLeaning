@@ -146,6 +146,16 @@ func(p *Publish) xxx()
 
 13. 字符串
 Go中的字符串是一种数据类型，默认为空串，而不是nil
+
+// $GOROOT/src/reflect/value.go
+// StringHeader是一个string的运行时表示
+type StringHeader struct {
+    Data uintptr
+    Len  int
+}
+string 类型其实是一个“描述符”，它本身并不真正存储字符串数据，
+而仅是由一个指向底层存储的指针和字符串的长度字段组成的。
+
 len(str)求出的是字符串占用的byte(字节)数量，a-z英文字符占1个字节，但是中文可能占2-3个字节
 字符串遍历和数组遍历一样用range即可
 字符串底层实现时一个[]byte数组，可以用[]byte(s)将字符串s强转为byte数组
