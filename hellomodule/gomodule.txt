@@ -1,0 +1,30 @@
+Go module 构建模式是在 Go 1.11 版本正式引入的，为的是彻底解决 Go 项目复杂版本依赖的问题，
+在 Go 1.16 版本中，Go module 已经成为了 Go 默认的包依赖管理机制和 Go 源码构建机制。
+
+Go Module 的核心是一个名为 go.mod 的文件，在这个文件中存储了这个 module 对第三方依赖的全部信息。
+
+创建hellomodule.go, 直接go build会报错，先执行go mod：
+$go mod init github.com/luoji_demo/hellomodule
+go: creating new go.mod: module github.com/bigwhite/hellomodule
+go: to add module requirements and sums:
+go mod tidy
+
+这时候生成了一个，go.mod文件
+一个 module 就是一个包的集合，这些包和 module 一起打版本、发布和分发。
+go.mod 所在的目录被我们称为它声明的 module 的根目录。
+
+由于在hellomodule.go中引入了两个第三方包，我们可以手动引入，也可以使用如下命令引入：
+$go mod tidy       
+go: downloading go.uber.org/zap v1.18.1
+go: downloading github.com/valyala/fasthttp v1.28.0
+go: downloading github.com/andybalholm/brotli v1.0.2
+... ...
+
+执行完后发现，go.mod中也加入了三方包的引用。
+
+这时候就可以 go build hellomodule.go,
+在windows下生成的是hellomoudle.exe, Linux、Mac等是hellomoudle,
+直接即可执行。
+
+Go 是一种编译型语言，这意味着只有你编译完 Go 程序之后，才可以将生成的可执行文件交付于其他人，
+并运行在没有安装 Go 的环境中。

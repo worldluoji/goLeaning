@@ -18,3 +18,8 @@ go version ： print Go version
 go vet  : report likely mistakes in packages
 
 go help xxx
+
+配置国内镜像代理（使用阿里云镜像）
+go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/
+验证
+go env|grep GOPROXY
