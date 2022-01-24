@@ -21,6 +21,8 @@ go: downloading github.com/andybalholm/brotli v1.0.2
 ... ...
 
 执行完后发现，go.mod中也加入了三方包的引用。
+还生成了一个名为 go.sum 的文件，这个文件记录了 hellomodule 的直接依赖和间接依赖包的相关版本的 hash 值，
+用来校验本地包的正确性。
 
 这时候就可以 go build hellomodule.go,
 在windows下生成的是hellomoudle.exe, Linux、Mac等是hellomoudle,
