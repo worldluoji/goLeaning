@@ -66,6 +66,7 @@ func TestPanic(t *testing.T) {
 		t.Log("end...")
 	}()
 	t.Log("start...")
-	panic("panic happens...")
+	// panic，也会执行defer中的内容
+	// panic("panic happens...")
 	// t.Log("end...") unreachable
 }
