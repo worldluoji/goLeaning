@@ -209,6 +209,21 @@ Go中推荐使用channel来进行goroutine之间的通信
 不过，需要注意的是 Go 中 channel 的容量可以是 0，容量为 0 的 channel 在 Go 中被称为无缓冲的 channel，
 容量大于 0 的则被称为有缓冲的 channel。
 
+针对 channel ch 的类型不同，len(ch) 有如下两种语义：
+当 ch 为无缓冲 channel 时，len(ch) 总是返回 0；
+当 ch 为带缓冲 channel 时，len(ch) 返回当前 channel ch 中尚未被读取的元素个数。
+而cap(ch)返回的是信道的容量
+
+channel 原语用于多个 Goroutine 间的通信，一旦多个 Goroutine 共同对 channel 进行收发操作，
+len(channel) 就会在多个 Goroutine 间形成“竞态”。
+单纯地依靠 len(channel) 来判断 channel 中元素状态，是不能保证在后续对 channel 的收发时 channel 状态是不变的。
+
+但两种场景可以使用：
+一个是“多发送单接收”的场景，也就是有多个发送者，但有且只有一个接收者。在这样的场景下，
+我们可以在接收 goroutine 中使用len(channel)是否大于0来判断是否 channel 中有数据需要接收。
+另一个是“多接收单发送”的场景，也就是有多个接收者，但有且只有一个发送者。在这样的场景下，
+我们可以在发送 Goroutine 中使用len(channel)是否小于cap(channel)来判断是否可以执行向 channel 的发送操作。
+
 2) channel的使用
 创建一个可以传递bool类型值的无法缓冲channel：var ch = make(chan bool)
 发送 : ch<-true 将true写入channel
@@ -248,6 +263,23 @@ for x := range ch接收信道数时，遇到信道关闭，接收方仍然可以
 如果信道中没有数据，也没有关闭信道则会阻塞。
 向关闭的信道发送数据会导致panic
 v,ok := <-ch 可以用第二个参数ok判断信道是否已经关闭，ok为false说明信道已经关闭
+
+nil channel
+如果一个 channel 类型变量的值为 nil，我们称它为 nil channel。
+nil channel 有一个特性，那就是对 nil channel 的读写都会发生阻塞。
+
+func main() {
+	var c chan int
+	<-c //阻塞
+}
+
+或者：
+
+func main() {
+	var c chan int
+	c<-1  //阻塞
+}
+
 
 21. sync.WaitGroup的使用
 var wg sync.WaitGroup

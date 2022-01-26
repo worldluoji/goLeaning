@@ -97,6 +97,38 @@ func TestSelectChannelCase(t *testing.T) {
 	}
 }
 
+func TestSelectHeartBeat(t *testing.T) {
+	ch := make(chan string)
+	stop := make(chan bool)
+	go func(chan string) {
+		time.Sleep(100 * time.Millisecond)
+		ch <- "data...data...data"
+	}(ch)
+
+	go func(chan bool) {
+		time.Sleep(10 * time.Second)
+		stop <- true
+	}(stop)
+
+	heartbeat := time.NewTicker(3000 * time.Millisecond)
+	defer heartbeat.Stop()
+	for {
+		select {
+		case msg, ok := <-ch:
+			if !ok {
+				ch = nil
+			} else {
+				fmt.Println(msg)
+			}
+		case <-heartbeat.C:
+			fmt.Println("heart beat...")
+		case <-stop:
+			fmt.Println("stop work...")
+			return
+		}
+	}
+}
+
 func echo(nums []int) <-chan int {
 	out := make(chan int)
 	go func() {
@@ -159,4 +191,77 @@ func TestPipeline2(t *testing.T) {
 	for r := range out {
 		fmt.Println(r)
 	}
+}
+
+func TestNilChannel(t *testing.T) {
+	ch1, ch2 := make(chan int), make(chan int)
+	go func() {
+		time.Sleep(time.Second * 5)
+		ch1 <- 5
+		close(ch1)
+	}()
+
+	go func() {
+		time.Sleep(time.Second * 7)
+		ch2 <- 7
+		close(ch2)
+	}()
+
+	var ok1, ok2 bool
+	for {
+		select {
+		// 由于5S后 ，ch1 处于关闭状态，从这个 channel 获取数据，我们会得到这个 channel 对应类型的零值，
+		// 这里就是 0。于是程序再次输出 0；程序按这个逻辑循环执行，一直输出 0 值
+		case x := <-ch1:
+			ok1 = true
+			fmt.Println(x)
+		case x := <-ch2:
+			ok2 = true
+			fmt.Println(x)
+		}
+
+		if ok1 && ok2 {
+			break
+		}
+	}
+	fmt.Println("program end")
+}
+
+/*
+* 使用nil channel解决上述问题
+ */
+func TestNilChannel2(t *testing.T) {
+	ch1, ch2 := make(chan int), make(chan int)
+	go func() {
+		time.Sleep(time.Second * 5)
+		ch1 <- 5
+		close(ch1)
+	}()
+
+	go func() {
+		time.Sleep(time.Second * 7)
+		ch2 <- 7
+		close(ch2)
+	}()
+
+	for {
+		select {
+		case x, ok := <-ch1:
+			if !ok {
+				ch1 = nil
+			} else {
+				fmt.Println(x)
+			}
+		case x, ok := <-ch2:
+			if !ok {
+				ch2 = nil
+			} else {
+				fmt.Println(x)
+			}
+		}
+		if ch1 == nil && ch2 == nil {
+			break
+		}
+	}
+	fmt.Println("program end")
 }
