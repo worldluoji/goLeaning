@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 func echo(w http.ResponseWriter, r *http.Request) {
@@ -16,6 +17,21 @@ func WithServerHeader(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("-->WithServerHeader()")
 		w.Header().Set("Server", "EchoSever 0.0.1")
+		for k, v := range r.Header {
+			for _, s := range v {
+				w.Header().Add(k, s)
+			}
+		}
+
+		version := os.Getenv("JAVA_HOME")
+		if version != "" {
+			w.Header().Set("VERSION", version)
+		} else {
+			w.Header().Set("VERSION", "UnKnown")
+		}
+
+		w.WriteHeader(200)
+
 		h(w, r)
 	}
 }
@@ -42,8 +58,8 @@ func handler(h http.HandlerFunc, decorators ...HTTPHandlerDecorator) http.Handle
 }
 
 func main() {
-	http.HandleFunc("/v1/echo", handler(echo, WithServerHeader, WithAuthCookie))
-	err := http.ListenAndServe(":8080", nil)
+	http.HandleFunc("/health", handler(echo, WithServerHeader, WithAuthCookie))
+	err := http.ListenAndServe(":8088", nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
