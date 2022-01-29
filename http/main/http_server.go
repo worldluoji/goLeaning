@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/http/pprof"
 	"os"
 )
 
@@ -58,8 +59,17 @@ func handler(h http.HandlerFunc, decorators ...HTTPHandlerDecorator) http.Handle
 }
 
 func main() {
-	http.HandleFunc("/health", handler(echo, WithServerHeader, WithAuthCookie))
-	err := http.ListenAndServe(":8088", nil)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/health", handler(echo, WithServerHeader, WithAuthCookie))
+	mux.HandleFunc("/debug/pprof/", pprof.Index)
+	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+	server := &http.Server{
+		Addr:    ":8088",
+		Handler: mux,
+	}
+	err := server.ListenAndServe()
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
