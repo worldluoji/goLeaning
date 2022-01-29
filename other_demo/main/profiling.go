@@ -64,3 +64,12 @@ func main() {
 	}
 	log.Println("result:", result)
 }
+
+/*
+* 执行完成过后，会在配置的目录下生成分析文件，这个文件是不能直接打开的，需要使用自带的pprof工具进行分析
+PS D:\go\src\github.com\luoji_demo\other_demo\main> go tool pprof D:\\go\\tmp\\cpuprofile\\test.txt
+Type: cpu
+Time: Jan 29, 2022 at 10:51am (CST)
+Duration: 200.92ms, Total samples = 50ms (24.89%)
+Entering interactive mode (type "help" for commands, "o" for options)
+*/
