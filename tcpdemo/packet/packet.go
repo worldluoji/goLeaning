@@ -8,6 +8,7 @@ package packet
 import (
 	"bytes"
 	"fmt"
+	"sync"
 )
 
 const (
@@ -55,6 +56,13 @@ func (s *SubmitAck) Encode() ([]byte, error) {
 	return bytes.Join([][]byte{[]byte(s.ID[:8]), {s.Result}}, nil), nil
 }
 
+// sync.Pool 就是官方实现的一个可复用的内存对象池，使用 sync.Pool，我们可以减少堆对象分配的频度，进而降低给 GC 带去的压力。
+var SubmitPool = sync.Pool{
+	New: func() interface{} {
+		return &Submit{}
+	},
+}
+
 func Decode(packet []byte) (Packet, error) {
 	commandID := packet[0]
 	pktBody := packet[1:]
@@ -65,12 +73,12 @@ func Decode(packet []byte) (Packet, error) {
 	case CommandConnAck:
 		return nil, nil
 	case CommandSubmit:
-		s := Submit{}
+		s := SubmitPool.Get().(*Submit)
 		err := s.Decode(pktBody)
 		if err != nil {
 			return nil, err
 		}
-		return &s, nil
+		return s, nil
 	case CommandSubmitAck:
 		s := SubmitAck{}
 		err := s.Decode(pktBody)
@@ -82,7 +90,6 @@ func Decode(packet []byte) (Packet, error) {
 		return nil, fmt.Errorf("unknown commandID [%d]", commandID)
 	}
 }
-
 
 func Encode(p Packet) ([]byte, error) {
 	var commandID uint8

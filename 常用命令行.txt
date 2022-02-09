@@ -23,3 +23,51 @@ go help xxx
 go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/
 验证
 go env|grep GOPROXY
+
+
+服务启动后，通过 go tool pprof 进行命令行采数：
+$ go tool pprof http://localhost:6060/debug/pprof/allocs
+Fetching profile over HTTP from http://192.168.10.18:6060/debug/pprof/allocs
+Saved profile in /root/pprof/pprof.server.alloc_objects.alloc_space.inuse_objects.inuse_space.001.pb.gz
+File: server
+Type: alloc_space
+Time: Jan 23, 2022 at 6:05pm (CST)
+Entering interactive mode (type "help" for commands, "o" for options)
+
+数据获取到后，我们就可以使用 go tool pprof 提供的命令行交互指令，来查看各个函数的堆内存对象的分配情况，
+其中最常用的一个指令就是 top :
+(pprof) top
+Showing nodes accounting for 119.27MB, 97.93% of 121.79MB total
+Dropped 31 nodes (cum <= 0.61MB)
+Showing top 10 nodes out of 30
+      flat  flat%   sum%        cum   cum%
+      38MB 31.20% 31.20%    43.50MB 35.72%  github.com/bigwhite/tcp-server-demo2/packet.Decode
+   28.50MB 23.40% 54.61%    28.50MB 23.40%  github.com/bigwhite/tcp-server-demo2/frame.(*myFrameCodec).Decode
+      18MB 14.78% 69.39%       79MB 64.87%  main.handlePacket
+   17.50MB 14.37% 83.76%    17.50MB 14.37%  bytes.Join
+       9MB  7.39% 91.15%        9MB  7.39%  encoding/binary.Write
+    5.50MB  4.52% 95.66%     5.50MB  4.52%  github.com/bigwhite/tcp-server-demo2/packet.(*Submit).Decode (inline)
+    1.76MB  1.45% 97.11%     1.76MB  1.45%  compress/flate.NewWriter
+       1MB  0.82% 97.93%        1MB  0.82%  runtime.malg
+         0     0% 97.93%     1.76MB  1.45%  bufio.(*Writer).Flush
+         0     0% 97.93%     1.76MB  1.45%  compress/gzip.(*Writer).Write
+
+
+查看哪一行内存消耗最大：
+(pprof) list packet.Decode
+Total: 121.79MB
+ROUTINE ======================== github.com/bigwhite/tcp-server-demo2/packet.Decode in /root/baim/tcp-server-demo2-with-pprof/packet/packet.go
+    38MB    43.50MB (flat, cum) 35.72% of Total
+        .          .     75:  case CommandConn:
+        .          .     76:    return nil, nil
+        .          .     77:  case CommandConnAck:
+        .          .     78:    return nil, nil
+        .          .     79:  case CommandSubmit:
+    38MB       38MB     80:    s := Submit{}
+        .     5.50MB     81:    err := s.Decode(pktBody)
+        .          .     82:    if err != nil {
+        .          .     83:      return nil, err
+        .          .     84:    }
+        .          .     85:    return &s, nil
+        .          .     86:  case CommandSubmitAck:
+(pprof) 

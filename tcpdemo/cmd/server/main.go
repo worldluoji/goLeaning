@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"net"
+	"net/http"
+	_ "net/http/pprof"
 
 	"github.com/luoji_demo/tcpdemo/frame"
 	"github.com/luoji_demo/tcpdemo/packet"
@@ -74,6 +76,15 @@ func handleConn(c net.Conn) {
 }
 
 func main() {
+
+	/*
+	* 我们只需要以空导入的方式导入 net/http/pprof 包，并在一个单独的 goroutine 中启动一个标准的 http 服务，就可以实现对 pprof 性能剖析的支持。
+	* pprof 工具可以通过 6060 端口采样到我们的 Go 程序的运行时数据。
+	 */
+	go func() {
+		http.ListenAndServe(":6060", nil)
+	}()
+
 	l, err := net.Listen("tcp", ":8888")
 	if err != nil {
 		fmt.Println("listen error:", err)
