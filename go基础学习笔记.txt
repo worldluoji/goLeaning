@@ -165,6 +165,13 @@ len(str)求出的是字符串占用的byte(字节)数量，a-z英文字符占1�
 14.defer
 defer后的东东，在return之前执行
 
+defer 关键字后面只能接函数（或方法），这些函数被称为 deferred 函数。
+defer 将它们注册到其所在 Goroutine 中，用于存放 deferred 函数的栈数据结构中，
+这些 deferred 函数将在执行 defer 的函数退出前，按后进先出（LIFO）的顺序被程序调度执行
+无论是执行到函数体尾部返回，还是在某个错误处理分支显式 return，又或是出现 panic，已经存储到 deferred 函数栈中的函数，都会被调度执行。
+所以说，deferred 函数是一个可以在任何情况下为函数进行收尾工作的好“伙伴”。
+
+
 15. %p输出地址，%T输出类型，%v输出数组，切片，结构体； %#v可以输出结构体更详细的信息
 
 16. make和new的区别：make只能为slice,map,channel三种类型分配内存;
@@ -176,9 +183,11 @@ type error interface {
 	Error() string
 }
 通过errors.New可以方便创建一个error对象
-panic 用于不不可以恢复的错误，退出前会执⾏ defer 指定的内容
+panic 用于不不可以恢复的错误，退出前会执⾏ defer 指定的内容。panic更像是Java中的异常，用于描述“不可预见的错误”。
 os.Exit 退出时不不会调⽤用 defer 指定的函数，退出时不不输出当前调⽤用栈信
 recover一般适用于应用程序全局的未处理错误而不是某个函数。类似于Java异常处理Catch到异常后的处理
+
+如果某个goroutine发生panic且没有被捕获，会导致整个Go程序退出，而不是只影响panic的goroutine.
 
 
 18. 协程
@@ -230,6 +239,7 @@ len(channel) 就会在多个 Goroutine 间形成“竞态”。
 接收 : v := <-ch 
 无缓冲的channel发送操作总是在接收操作之前完成
 无缓冲channel必须收发配对，否则信道将阻塞，发生死锁。就像快递一样，快递员<->用户。
+无缓冲信道收和发都会发生阻塞。
 
 指定第二个参数则定义有缓冲信道：
 var ch = make(chan bool, 3) 这样就定义了一个缓存大小为3的channel.
