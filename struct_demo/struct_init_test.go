@@ -51,6 +51,8 @@ func NewFoo(id int, options ...FooOption) *Foo {
 	return foo
 }
 
+// Go 中的方法必须是归属于一个类型的，而 receiver 参数的类型就是这个方法归属的类型，或者说这个方法就是这个类型的一个方法
+// 这里foo就是receiver
 func (foo *Foo) PrintInfo() {
 	fmt.Printf("name:%s,age:%d\n", foo.name, foo.age)
 }

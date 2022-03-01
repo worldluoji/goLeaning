@@ -1,6 +1,9 @@
 package struct_demo
 
 import (
+	"fmt"
+	"io"
+	"strings"
 	"testing"
 	"unsafe"
 )
@@ -38,7 +41,7 @@ func TestCreateAndInitStructCase3(t *testing.T) {
 	t.Log(user.Name, user.Age, user.address)
 }
 
-type S struct {
+type S0 struct {
 	a uint16
 	b uint32
 }
@@ -47,7 +50,7 @@ func TestEmptyStruct(t *testing.T) {
 	var s string
 	var c complex128
 	var a [3]uint32
-	var st S
+	var st S0
 	t.Log(unsafe.Sizeof(s))  // 16
 	t.Log(unsafe.Sizeof(c))  // 16
 	t.Log(unsafe.Sizeof(a))  // 12 = 3 * （32 / 8）
@@ -63,14 +66,14 @@ func (n *MyInt) Add(m int) {
 	*n = *n + MyInt(m)
 }
 
-type t struct {
+type T struct {
 	a int
 	b int
 }
 
 type S struct {
 	*MyInt
-	t
+	T
 	io.Reader
 	s string
 	n int
@@ -86,7 +89,7 @@ func TestStructCombine(t *testing.T) {
 	r := strings.NewReader("hello, go")
 	s := S{
 		MyInt: &m,
-		t: t{
+		T: T{
 			a: 1,
 			b: 2,
 		},
@@ -99,4 +102,5 @@ func TestStructCombine(t *testing.T) {
 	fmt.Println(string(sl)) // hello, go
 	s.MyInt.Add(5)
 	fmt.Println(*(s.MyInt)) // 22
+	fmt.Println(s.a)
 }
