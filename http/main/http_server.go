@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/pprof"
@@ -58,6 +60,21 @@ func handler(h http.HandlerFunc, decorators ...HTTPHandlerDecorator) http.Handle
 	return h
 }
 
+// post 请求测试
+func postHandler(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println("read request error")
+		return
+	}
+	log.Println("response Body:", string(body))
+	_, err = io.WriteString(w, `{"RETCODE":"Success"}`)
+	if err != nil {
+		log.Println("write response error")
+	}
+}
+
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", handler(echo, WithServerHeader, WithAuthCookie))
@@ -65,6 +82,7 @@ func main() {
 	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
 	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
 	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+	mux.HandleFunc("/post", postHandler)
 	server := &http.Server{
 		Addr:    ":8088",
 		Handler: mux,
