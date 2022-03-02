@@ -6,6 +6,10 @@ import (
 	"testing"
 )
 
+// 构造error的两种方式
+// err := errors.New("your first demo error")
+// errWithCtx = fmt.Errorf("index %d is out of bounds", i)
+
 var DevideZeroError = errors.New("除数不能为0")
 
 func devide(a, b int) (int, error) {
@@ -21,6 +25,53 @@ func TestErrorCase1(t *testing.T) {
 	} else {
 		t.Log("Error happend:", err)
 	}
+}
+
+// $GOROOT/src/bufio/bufio.go
+var (
+	ErrInvalidUnreadByte = errors.New("bufio: invalid use of UnreadByte")
+	ErrInvalidUnreadRune = errors.New("bufio: invalid use of UnreadRune")
+	ErrBufferFull        = errors.New("bufio: buffer full")
+	ErrNegativeCount     = errors.New("bufio: negative count")
+)
+
+var ErrSentinel = errors.New("the underlying sentinel error")
+
+// 如果 error 类型变量的底层错误值是一个包装错误（Wrapped Error），errors.Is 方法会沿着该包装错误所在错误链（Error Chain)，与链上所有被包装的错误（Wrapped Error）进行比较，直至找到一个匹配的错误为止
+func TestErrorCase2(t *testing.T) {
+	err1 := fmt.Errorf("wrap sentinel: %w", ErrSentinel)
+	err2 := fmt.Errorf("wrap err1: %w", err1)
+	println(err2 == ErrSentinel) //false
+	if errors.Is(err2, ErrSentinel) {
+		println("err2 is ErrSentinel")
+		return
+	}
+
+	println("err2 is not ErrSentinel")
+}
+
+type MyError struct {
+	e string
+}
+
+func (e *MyError) Error() string {
+	return e.e
+}
+
+// 从 Go 1.13 版本开始，标准库 errors 包提供了As函数给错误处理方检视错误值。
+// As函数类似于通过类型断言判断一个 error 类型变量是否为特定的自定义错误类型
+func TestErrorCase3(t *testing.T) {
+	var err = &MyError{"MyError error demo"}
+	err1 := fmt.Errorf("wrap err: %w", err)
+	err2 := fmt.Errorf("wrap err1: %w", err1)
+	var e *MyError
+	if errors.As(err2, &e) {
+		println("MyError is on the chain of err2")
+		// errors.As函数沿着 err2 所在错误链向下找到了被包装到最深处的错误值，并将 err2 与其类型 * MyError成功匹配。匹配成功后，errors.As 会将匹配到的错误值存储到 As 函数的第二个参数中，这也是为什么println(e == err)输出 true 的原因
+		println(e == err)
+		return
+	}
+	println("MyError is not on the chain of err2")
 }
 
 /*
