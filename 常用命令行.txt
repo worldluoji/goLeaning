@@ -71,3 +71,6 @@ ROUTINE ======================== github.com/bigwhite/tcp-server-demo2/packet.Dec
         .          .     85:    return &s, nil
         .          .     86:  case CommandSubmitAck:
 (pprof) 
+
+
+我们可以使用 go build -gcflags="-m" 来观察逃逸分析的结果.
