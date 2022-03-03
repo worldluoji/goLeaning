@@ -29,6 +29,13 @@ func TestMapCase2(t *testing.T) {
 	}
 }
 
+func TestMapCase3(t *testing.T) {
+	m := make(map[string]int)
+	m["a"] = 1
+	m["b"] = 2
+	t.Log(m)
+}
+
 func TestMapValueFunc(t *testing.T) {
 	m := map[int]func(num int) int{}
 	m[0] = func(num int) int {
