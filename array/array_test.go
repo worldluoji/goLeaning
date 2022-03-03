@@ -47,6 +47,18 @@ func TestSliceAppend2(t *testing.T) {
 	fmt.Println(b)
 }
 
+func add(a []int, val int) {
+	a = append(a, val)
+}
+
+func TestSliceAppend3(t *testing.T) {
+	a := make([]int, 3)
+	a = append(a, 3, 4, 5)
+	t.Log(a)
+	add(a, 8)
+	t.Log(a)
+}
+
 func TestSortIntSlice(t *testing.T) {
 	sl := []int{3, 1, 2, 5, 6, 4}
 	sort.Sort(sort.IntSlice(sl))
