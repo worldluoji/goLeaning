@@ -1,0 +1,5 @@
+这是个渲染yaml的神器
+
+mkdir -p $GOPATH/bin
+cd $GOPATH/bin
+GOBIN=$(pwd)/ GO111MODULE=on go get sigs.k8s.io/kustomize/kustomize/v3
