@@ -2,6 +2,7 @@ package goroutine
 
 import (
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 )
@@ -18,25 +19,29 @@ func TestGoroutineCase1(t *testing.T) {
 }
 
 // 在容量为C的channel上的第k个接收先行发生于从这个channel上的第k+C次发送完成。
+// 可以理解为， channel最多只能有C个元素，超过了入队就会阻塞
 func TestGoroutineCase2(t *testing.T) {
 	start := time.Now()
 	ch := make(chan int, 2)
+	var wg sync.WaitGroup
 	for i := 0; i < 6; i++ {
+		wg.Add(1)
 		go func(num int) {
 			ch <- num
 			t.Logf("发送第%d个元素\n", num)
 		}(i)
 	}
-	// 该例子可以看到，接收的顺序，不一定就是发送的顺序。
+
 	for i := 0; i < 6; i++ {
-		go func(i int) {
+		go func(num int) {
 			o := <-ch
-			t.Logf("收到的第%d个元素为%d\n", i, o)
+			t.Logf("收到的第%d个元素为%d\n", num, o)
+			wg.Done()
 		}(i)
 	}
+	wg.Wait()
 	elapse := time.Since(start)
 	t.Log("耗时时间为：", elapse)
-	time.Sleep(100 * time.Millisecond)
 }
 
 var cht = make(chan int)
