@@ -61,6 +61,43 @@ single-exe-layout
 ├── pkg2/
 └── vendor/
 
+
+internal目录还可以根据实际项目来细分，比如：
+├── apiserver
+│   ├── api
+│   │   └── v1
+│   │       └── user
+│   ├── options
+│   ├── config
+│   ├── service
+│   │   └── user.go
+│   ├── store
+│   │   ├── mysql
+│   │   │   └── user.go
+│   │   ├── fake
+│   └── testing
+├── authzserver
+│   ├── api
+│   │   └── v1
+│   ├── options
+│   ├── store
+│   └── testing
+├── iamctl
+│   ├── cmd
+│   │   ├── cmd.go
+│   │   ├── info
+└── pkg
+    ├── code
+    ├── middleware
+    ├── options
+    └── validation
+
+/internal/apiserver/options：应用的 command flag。
+/internal/apiserver/config：根据命令行参数创建应用配置。
+/internal/apiserver/service：存放应用复杂业务处理代码。
+/internal/apiserver/store/mysql：一个应用可能要持久化的存储一些数据，这里主要存放跟数据库交互的代码，
+比如 Create、Update、Delete、Get、List 等。
+
 二. Go库项目的典型结构布局
 
 $tree -F lib-layout 
