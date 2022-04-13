@@ -34,5 +34,7 @@ func GetInstance() *IDGenerator {
 func TestSingleton(t *testing.T) {
 	idGenerator1 := GetInstance()
 	idGenerator2 := GetInstance()
+	id := idGenerator2.GetAndIncrement()
 	t.Log("它们是相同的对象吗？", idGenerator1 == idGenerator2)
+	t.Log(id, idGenerator1.ID)
 }
