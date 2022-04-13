@@ -19,13 +19,13 @@ go vet  : report likely mistakes in packages
 
 go help xxx
 
-配置国内镜像代理（使用阿里云镜像）
+1. 配置国内镜像代理（使用阿里云镜像）
 go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/
 验证
 go env|grep GOPROXY
 
 
-服务启动后，通过 go tool pprof 进行命令行采数：
+2. 服务启动后，通过 go tool pprof 进行命令行采数：
 $ go tool pprof http://localhost:6060/debug/pprof/allocs
 Fetching profile over HTTP from http://192.168.10.18:6060/debug/pprof/allocs
 Saved profile in /root/pprof/pprof.server.alloc_objects.alloc_space.inuse_objects.inuse_space.001.pb.gz
@@ -73,10 +73,13 @@ ROUTINE ======================== github.com/bigwhite/tcp-server-demo2/packet.Dec
 (pprof) 
 
 
-我们可以使用 go build -gcflags="-m" 来观察逃逸分析的结果.
+3. 我们可以使用 go build -gcflags="-m" 来观察逃逸分析的结果.
 
+4. 单元测试覆盖率查看
+$ go test -race -cover  -coverprofile=./coverage.out -timeout=10m -short -v ./...
+$ go tool cover -func ./coverage.out
 
-常用mock工具：
+5. 常用mock工具：
 1）golang/mock，是官方提供的 Mock 框架。它实现了基于 interface 的 Mock 功能，
 能够与 Golang 内置的 testing 包做很好的集成，是最常用的 Mock 工具。
 golang/mock 提供了 mockgen 工具用来生成 interface 对应的 Mock 源文件。
