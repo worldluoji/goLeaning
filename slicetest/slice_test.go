@@ -107,15 +107,13 @@ func Test2DimensionArray(t *testing.T) {
 	col := 3
 	// 动态二维数据
 	var arr [][]int
-	for x := 0; x < row; x++ {  //循环为一维长度
+	for x := 0; x < row; x++ { //循环为一维长度
 		ar := make([]int, col) //创建一个一维切片
-		arr = append(arr, ar)    //把一维切片,当作一个整体传入二维切片中
+		arr = append(arr, ar)  //把一维切片,当作一个整体传入二维切片中
 	}
 	arr[1][2] = 1
 	t.Log(arr)
 }
-
-
 
 func TestNSum(t *testing.T) {
 	nums := []int{2, -4, -5, -2, -3, -5, 0, 4, -2}
@@ -216,4 +214,36 @@ func twoSum(nums []int, target int) [][]int {
 		}
 	}
 	return res
+}
+
+/*
+* 排序函数如下
+1. Slice() 不稳定排序
+
+2. SliceStable() 稳定排序
+
+3. SliceIsSorted() 判断是否已排序
+结构体数据组也用同样的方式排序
+*/
+
+func TestTwoDimArraySort(t *testing.T) {
+	interval := [][]int{
+		{2, 2},
+		{2, 3},
+		{3, 3},
+		{1, 3},
+		{5, 7},
+		{2, 2},
+		{4, 6},
+	}
+	sort.Slice(interval, func(i, j int) bool {
+		return interval[i][0] > interval[j][0] //按照每行的第一个元素排序
+	})
+	t.Log(interval)
+
+	lowToHitghsorted := sort.SliceIsSorted(interval, func(i, j int) bool {
+		return interval[i][0] < interval[j][0]
+	})
+	t.Log("是否从小到大排序：", lowToHitghsorted)
+
 }
