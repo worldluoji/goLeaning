@@ -76,6 +76,7 @@ func postHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	// http.ListenAndServe(addr string, handler Handler) 这种方法只有一个url
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", handler(echo, WithServerHeader, WithAuthCookie))
 	mux.HandleFunc("/debug/pprof/", pprof.Index)
