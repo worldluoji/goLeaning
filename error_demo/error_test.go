@@ -10,11 +10,11 @@ import (
 // err := errors.New("your first demo error")
 // errWithCtx = fmt.Errorf("index %d is out of bounds", i)
 
-var DevideZeroError = errors.New("除数不能为0")
+var ErrorDevideZero = errors.New("除数不能为0")
 
 func devide(a, b int) (int, error) {
 	if b == 0 {
-		return -1, DevideZeroError
+		return -1, ErrorDevideZero
 	}
 	return a / b, nil
 }
