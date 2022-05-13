@@ -73,12 +73,21 @@ func watch(ctx context.Context, name string) {
 	}
 }
 
-var key string = "name"
+type Key struct {
+	val string
+}
 
+var key = Key{
+	val: "name",
+}
+
+// valueCtx类似Java中的ThreadLocal
 func TestContextDemo3(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.TODO())
-	valueCtx := context.WithValue(ctx, key, "【监控1】")
-	go watchWithValue(valueCtx)
+	valueCtx1 := context.WithValue(ctx, key, "【监控1】")
+	valueCtx2 := context.WithValue(ctx, key, "【监控2】")
+	go watchWithValue(valueCtx1)
+	go watchWithValue(valueCtx2)
 	time.Sleep(10 * time.Second)
 	t.Log("可以了，通知监控停止")
 	cancel()
