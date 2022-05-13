@@ -3,6 +3,7 @@ package context_demo
 import (
 	"context"
 	"fmt"
+	"log"
 	"testing"
 	"time"
 )
@@ -104,6 +105,56 @@ func watchWithValue(ctx context.Context) {
 		default:
 			//取出值
 			fmt.Println(ctx.Value(key), "goroutine监控中...")
+			time.Sleep(2 * time.Second)
+		}
+	}
+}
+
+// 会造成竞争，map传递的是引用
+func TestContextDemo4(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.TODO())
+	mp := map[string]int{"age": 1}
+	valueCtx1 := context.WithValue(ctx, key, mp)
+	valueCtx2 := context.WithValue(ctx, key, mp)
+	go modifyValue(valueCtx1)
+	go modifyValue(valueCtx2)
+	time.Sleep(10 * time.Second)
+	t.Log("可以了，通知任务停止")
+	cancel()
+	time.Sleep(5 * time.Second)
+}
+
+func TestContextDemo5(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.TODO())
+	mp := map[string]int{"age": 1}
+	mpCopy := make(map[string]int, 1)
+	mpCopy["age"] = mp["age"]
+	valueCtx1 := context.WithValue(ctx, key, mp)
+	valueCtx2 := context.WithValue(ctx, key, mpCopy)
+	go modifyValue(valueCtx1)
+	go modifyValue(valueCtx2)
+	time.Sleep(10 * time.Second)
+	t.Log("可以了，通知任务停止")
+	cancel()
+	time.Sleep(5 * time.Second)
+}
+
+func modifyValue(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			//取出值
+			fmt.Println(ctx.Value(key), "停止了...")
+			return
+		default:
+			//取出值
+			val := ctx.Value(key)
+			mp, ok := val.(map[string]int)
+			if !ok {
+				log.Fatal("type error")
+			}
+			fmt.Println(mp["age"], "goroutine执行中...")
+			mp["age"] += 1
 			time.Sleep(2 * time.Second)
 		}
 	}
