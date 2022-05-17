@@ -270,3 +270,8 @@ func TestNilChannel2(t *testing.T) {
 	}
 	fmt.Println("program end")
 }
+
+func TestEmptyChannel(t *testing.T) {
+	var sem chan struct{}
+	t.Log(sem == nil, len(sem))
+}
