@@ -41,7 +41,7 @@ func init() {
 /*
 * CPU Profiling: 在代码中添加 CPUProfile 代码，runtime/pprof 包提供支持, 用于性能分析
 * go run .\profiling.go -good -bad
-* go run .\profiling.go -good
+* go run .\profiling.go --good=false
 * go run .\profiling.go
  */
 func main() {
