@@ -1,0 +1,4 @@
+test: 123
+spec:
+  replicas: 3
+  image: "nginx:1.20.1"
