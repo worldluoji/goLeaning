@@ -364,7 +364,8 @@ rw.RLock()/rw.RUnLock()就是读锁，读锁读不互斥，写互斥
 1）调用一个函数，应该由调用者决定是否启动一个goroutine，而不是在函数内部去启动一个goroutine,
 即谁去用，则谁启动goroutine;
 2）启动了一个goroutine,应该知道这个gotoutine什么时候结束;
-3）要能够管控一个goroutine什么时候退出，无论是用channel还是context超时退出。
+3）要能够管控一个goroutine什么时候退出，无论是用channel推出还是使用context超时退出。
+比如，发生某个err的时候，向channel发送一个退出信。
 
 28. 空导入
 像下面代码这样的包导入方式被称为“空导入”：
