@@ -31,7 +31,9 @@ func newProductHandler() *productHandler {
 	}
 }
 
+// curl -X POST -H 'Content-Type: application/json' -d '{"username":"luoji","name":"mate50","category":"mobile","price":5000,"description":"Greate Mobile"}' http://localhost:8098/v1/products
 func (u *productHandler) Create(c *gin.Context) {
+	// 	log.Println(c.GetHeader("Content-Type"))  -> would print application/json
 	u.Lock()
 	defer u.Unlock()
 
@@ -58,11 +60,14 @@ func (u *productHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusOK, product)
 }
 
+// http://localhost:8098/v1/products/mate50
 func (u *productHandler) Get(c *gin.Context) {
 	u.Lock()
 	defer u.Unlock()
 
+	// c.Param获取路径参数
 	product, ok := u.products[c.Param("name")]
+	// log.Println(c.Param("name")) -> would print mate50
 	if !ok {
 		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Errorf("can not found product %s", c.Param("name"))})
 		return
@@ -71,9 +76,20 @@ func (u *productHandler) Get(c *gin.Context) {
 	c.JSON(http.StatusOK, product)
 }
 
+// http://localhost:8098/v1/products/query?name=huawei
+func (u *productHandler) GetQueryParam(c *gin.Context) {
+	name, ok := c.GetQuery("name")
+	if !ok {
+		c.JSON(http.StatusNotFound, gin.H{"error": fmt.Errorf("failed to get param")})
+		return
+	}
+	c.JSON(http.StatusOK, name)
+}
+
 func router() http.Handler {
 	router := gin.Default()
 	productHandler := newProductHandler()
+
 	// 路由分组、中间件、认证
 	v1 := router.Group("/v1")
 	{
@@ -82,6 +98,7 @@ func router() http.Handler {
 			// 路由匹配
 			productv1.POST("", productHandler.Create)
 			productv1.GET(":name", productHandler.Get)
+			productv1.GET("/query", productHandler.GetQueryParam)
 		}
 	}
 
