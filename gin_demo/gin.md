@@ -55,3 +55,5 @@ v1.POST("/login", Login).Use(gin.BasicAuth(gin.Accounts{"foo": "bar", "colin": "
 - gin.BasicAuth()：HTTP 请求基本认证（使用用户名和密码进行认证）。
 
 #### 自定义中间件
+- Gin 还支持自定义中间件。中间件其实是一个函数，函数类型为 gin.HandlerFunc，HandlerFunc 底层类型为 func(*Context)
+- Logger中间件例子见-> ./middleware/main.go
