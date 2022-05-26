@@ -57,3 +57,146 @@ v1.POST("/login", Login).Use(gin.BasicAuth(gin.Accounts{"foo": "bar", "colin": "
 #### 自定义中间件
 - Gin 还支持自定义中间件。中间件其实是一个函数，函数类型为 gin.HandlerFunc，HandlerFunc 底层类型为 func(*Context)
 - Logger中间件例子见-> ./middleware/main.go
+
+<br>
+
+## 优雅关闭
+优雅关闭，即服务器关闭前，将正在处理的请求处理完成后再进行关闭。
+Go 1.8 版本或者更新的版本，http.Server 内置的 Shutdown 方法，已经实现了优雅关闭。
+示例如下：
+```
+// +build go1.8
+
+package main
+
+import (
+  "context"
+  "log"
+  "net/http"
+  "os"
+  "os/signal"
+  "syscall"
+  "time"
+
+  "github.com/gin-gonic/gin"
+)
+
+func main() {
+  router := gin.Default()
+  router.GET("/", func(c *gin.Context) {
+    time.Sleep(5 * time.Second)
+    c.String(http.StatusOK, "Welcome Gin Server")
+  })
+
+  srv := &http.Server{
+    Addr:    ":8080",
+    Handler: router,
+  }
+
+  // Initializing the server in a goroutine so that
+  // it won't block the graceful shutdown handling below
+  go func() {
+    if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+      log.Fatalf("listen: %s\n", err)
+    }
+  }()
+
+  // Wait for interrupt signal to gracefully shutdown the server with
+  // a timeout of 5 seconds.
+  quit := make(chan os.Signal, 1)
+  // kill (no param) default send syscall.SIGTERM
+  // kill -2 is syscall.SIGINT
+  // kill -9 is syscall.SIGKILL but can't be catch, so don't need add it
+  signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+  <-quit
+  log.Println("Shutting down server...")
+
+  // The context is used to inform the server it has 5 seconds to finish
+  // the request it is currently handling
+  ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+  defer cancel()
+  if err := srv.Shutdown(ctx); err != nil {
+    log.Fatal("Server forced to shutdown:", err)
+  }
+
+  log.Println("Server exiting")
+}
+```
+- 需要把 srv.ListenAndServe 放在 goroutine 中执行，这样才不会阻塞到 srv.Shutdown 函数。因为我们把 srv.ListenAndServe 放在了 goroutine 中，所以需要一种可以让整个进程常驻的机制。
+- 我们借助了有缓冲 channel，并且调用 signal.Notify 函数将该 channel 绑定到 SIGINT、SIGTERM 信号上。这样，收到 SIGINT、SIGTERM 信号后，quilt 通道会被写入值，从而结束阻塞状态，程序继续运行，执行 srv.Shutdown(ctx)，优雅关停 HTTP 服务。
+
+<br>
+
+下面是net/http包shutdown的优雅关闭：
+```
+// Shutdown gracefully shuts down the server without interrupting any
+// active connections. Shutdown works by first closing all open
+// listeners, then closing all idle connections, and then waiting
+// indefinitely for connections to return to idle and then shut down.
+// If the provided context expires before the shutdown is complete,
+// Shutdown returns the context's error, otherwise it returns any
+// error returned from closing the Server's underlying Listener(s).
+//
+// When Shutdown is called, Serve, ListenAndServe, and
+// ListenAndServeTLS immediately return ErrServerClosed. Make sure the
+// program doesn't exit and waits instead for Shutdown to return.
+//
+// Shutdown does not attempt to close nor wait for hijacked
+// connections such as WebSockets. The caller of Shutdown should
+// separately notify such long-lived connections of shutdown and wait
+// for them to close, if desired. See RegisterOnShutdown for a way to
+// register shutdown notification functions.
+//
+// Once Shutdown has been called on a server, it may not be reused;
+// future calls to methods such as Serve will return ErrServerClosed.
+func (srv *Server) Shutdown(ctx context.Context) error {
+	srv.inShutdown.setTrue()
+
+	srv.mu.Lock()
+	lnerr := srv.closeListenersLocked()
+	srv.closeDoneChanLocked()
+	for _, f := range srv.onShutdown {
+		go f()
+	}
+	srv.mu.Unlock()
+
+	ticker := time.NewTicker(shutdownPollInterval)
+	defer ticker.Stop()
+	for {
+		if srv.closeIdleConns() && srv.numListeners() == 0 {
+			return lnerr
+		}
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ticker.C:
+		}
+	}
+}
+
+关键在于每shutdownPollInterval毫秒进行一次检测，通过closeIdleConns查看是否还有activeConn：
+
+func (s *Server) closeIdleConns() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	quiescent := true
+	for c := range s.activeConn {
+		st, unixSec := c.getState()
+		// Issue 22682: treat StateNew connections as if
+		// they're idle if we haven't read the first request's
+		// header in over 5 seconds.
+		if st == StateNew && unixSec < time.Now().Unix()-5 {
+			st = StateIdle
+		}
+		if st != StateIdle || unixSec == 0 {
+			// Assume unixSec == 0 means it's a very new
+			// connection, without state set yet.
+			quiescent = false
+			continue
+		}
+		c.rwc.Close()
+		delete(s.activeConn, c)
+	}
+	return quiescent
+}
+```
