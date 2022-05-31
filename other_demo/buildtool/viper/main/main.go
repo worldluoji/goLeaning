@@ -11,12 +11,14 @@ var (
 	cfg         = pflag.StringP("config", "c", "", "Configuration file.")
 	help        = pflag.BoolP("help", "h", false, "Show this help message.")
 	CONFIG_PATH = "D:\\go\\src\\github.com\\luoji_demo\\other_demo\\buildtool\\viper"
+	token       = pflag.StringP("token", "t", "", "token for test")
 )
 
 func init() {
 	viper.SetDefault("TestParam", "333")
 	viper.SetDefault("Taxonomies", map[string]string{"tag": "tags", "category": "categories"})
 	viper.Set("user.username", "colin")
+	viper.BindPFlag("token", pflag.Lookup("token"))
 }
 
 func main() {
@@ -50,4 +52,5 @@ func main() {
 	fmt.Printf("Used configuration file is: %s\n", viper.ConfigFileUsed())
 	fmt.Println(viper.Get("TestParam"), viper.Get("user.username"))
 	fmt.Println(viper.GetInt("test"), viper.GetInt("spec.replicas"), viper.GetString("spec.image"))
+	fmt.Println(viper.Get("token") == *token)
 }
