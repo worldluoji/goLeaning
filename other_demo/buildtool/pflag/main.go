@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/pflag"
 )
 
+// 返回的是指针
 var ip = pflag.StringP("ip", "i", "0.0.0.0", "help message for ip")
 
 // 给变量赋值
@@ -33,10 +34,14 @@ func init() {
 // go run main.go --ip  -> 127.0.0.1
 // go run main.go --ip=1.1.1.1  -> 1.1.1.1
 // go run main.go --good
+// go run main.go good
 func main() {
 	pflag.Parse()
 	fmt.Println(*ip)
 	fmt.Println(good)
+	fmt.Printf("argument number is: %v\n", pflag.NArg())
+	fmt.Printf("argument list is: %v\n", pflag.Args())
+	fmt.Printf("the first argument is: %v\n", pflag.Arg(0))
 
 	if v, err := flagSet.GetBool("version"); err != nil {
 		fmt.Println(err)
