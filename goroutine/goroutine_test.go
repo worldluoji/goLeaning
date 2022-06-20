@@ -11,6 +11,7 @@ func hello(msg string) {
 	fmt.Println("Hello " + msg)
 }
 
+// go test -v .\goroutine_test.go -run TestGoroutineCase1
 func TestGoroutineCase1(t *testing.T) {
 	//在新的协程中执行hello方法
 	go hello("World")
@@ -68,7 +69,6 @@ func setVal2() {
 func TestGoroutineCase4(t *testing.T) {
 	go setVal2()
 	<-cht
-	// channel接收一定在发送之前，因此能正确打印出hello golang
 	fmt.Println(a)
 }
 
