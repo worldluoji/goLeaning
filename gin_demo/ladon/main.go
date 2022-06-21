@@ -37,6 +37,37 @@ var pol = &ladon.DefaultPolicy{
 	},
 }
 
+// // Metric is used to expose metrics about authz
+// type Metric interface {
+// 	// RequestDeniedBy is called when we get explicit deny by policy
+// 	RequestDeniedBy(Request, Policy)
+// 	// RequestAllowedBy is called when a matching policy has been found.
+// 	RequestAllowedBy(Request, Policies)
+// 	// RequestNoMatch is called when no policy has matched our request
+// 	RequestNoMatch(Request)
+// 	// RequestProcessingError is called when unexpected error occured
+// 	RequestProcessingError(Request, Policy, error)
+// }
+
+type prometheusMetrics struct{}
+
+// prometheusMetrics实现了下面4个函数，那么它就是一个ladon.Metric
+func (mtr *prometheusMetrics) RequestDeniedBy(r ladon.Request, p ladon.Policy) {
+	log.Println("Request deny ", r.Subject)
+}
+
+func (mtr *prometheusMetrics) RequestAllowedBy(r ladon.Request, policies ladon.Policies) {
+	log.Println("Request allowed ", r.Subject)
+}
+
+func (mtr *prometheusMetrics) RequestNoMatch(r ladon.Request) {
+	log.Println("Request Not Match ", r.Subject)
+}
+
+func (mtr *prometheusMetrics) RequestProcessingError(r ladon.Request, p ladon.Policy, err error) {
+	log.Println("Request error ", r.Subject, err)
+}
+
 // 实例化 warden
 var warden = &ladon.Ladon{
 	// 数据持久化
@@ -44,6 +75,8 @@ var warden = &ladon.Ladon{
 	// ladon.AuditLoggerInfo，该 AuditLogger 会在授权时打印调用的策略到标准错误
 	// 要实现一个新的 AuditLogger，你只需要实现 AuditLogger 接口就可以了。比如，我们可以实现一个 AuditLogger，将授权日志保存到 Redis 或者 MySQL 中。
 	AuditLogger: &ladon.AuditLoggerInfo{},
+
+	Metric: &prometheusMetrics{},
 }
 
 func init() {
