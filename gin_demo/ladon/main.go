@@ -90,27 +90,39 @@ func main() {
 		c.JSON(http.StatusOK, "Hello Ladon!!!")
 	})
 
-	r.POST("/check", func(c *gin.Context) {
+	r.POST("/v1/authz", func(c *gin.Context) {
 		accessRequest := &ladon.Request{}
 
 		if err := c.BindJSON(accessRequest); err != nil {
 			log.Println(err)
-			c.JSON(http.StatusBadRequest, gin.H{"message": "Bad Request"})
+			c.JSON(http.StatusBadRequest, gin.H{
+				"code":      http.StatusBadRequest,
+				"message":   "Bad Request",
+				"requestID": "123",
+				"allowed":   false,
+				"reason":    "parse error",
+				"error":     err})
 			return
 		}
 
 		// 判断是否拥有权限
 		var message string
+		var allowed bool
 		if err := warden.IsAllowed(accessRequest); err != nil {
 			message = "Not allowed"
+			allowed = false
 		} else {
 			message = "Allowed"
+			allowed = true
 		}
 
-		c.JSON(200, gin.H{
-			"message": message,
-		})
-
+		c.JSON(http.StatusOK, gin.H{
+			"code":      0,
+			"message":   message,
+			"requestID": "123",
+			"allowed":   allowed,
+			"reason":    "",
+			"error":     ""})
 	})
 
 	srv := &http.Server{
@@ -124,13 +136,13 @@ func main() {
 }
 
 /*
-$ curl -X POST -H 'Content-Type: application/json' -d '{"context":{"username":"luoji"}, "subject": "users:manager","action" : "delete", "resource": "resources:users"}' http://localhost:8083/check
+$ curl -X POST -H 'Content-Type: application/json' -d '{"context":{"username":"luoji"}, "subject": "users:manager","action" : "delete", "resource": "resources:users"}' http://localhost:8083/v1/authz
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100   132  100    21  100   111   2333  12333 --:--:-- --:--:-- --:--:-- 14666{"message":"Allowed"}
 
 
-$ curl -X POST -H 'Content-Type: application/json' -d '{"context":{"username":"zhangmiaomiao"}, "subject": "users:manager","action" : "delete", "resource": "resources:users"}' http://localhost:8083/check
+$ curl -X POST -H 'Content-Type: application/json' -d '{"context":{"username":"zhangmiaomiao"}, "subject": "users:manager","action" : "delete", "resource": "resources:users"}' http://localhost:8083/v1/authz
   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                  Dload  Upload   Total   Spent    Left  Speed
 100   144  100    25  100   119   2777  13222 --:--:-- --:--:-- --:--:-- 18000{"message":"Not allowed"}
