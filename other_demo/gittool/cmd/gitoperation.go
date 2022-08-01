@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"gopkg.in/src-d/go-git.v4/plumbing"
 	git "gopkg.in/src-d/go-git.v4"
+	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
 type ReferenceName string
@@ -34,7 +34,7 @@ func GitClone(directory, url, branch string) (*git.Repository, error) {
 		cloneDir = directory
 	}
 
-	fmt.Println("git clone", url, cloneDir)
+	fmt.Println("git clone", url, cloneDir, branch)
 	return git.PlainClone(cloneDir, false,
 		&git.CloneOptions{
 			URL: url,
