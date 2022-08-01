@@ -9,8 +9,6 @@ import (
 	"gopkg.in/src-d/go-git.v4/plumbing"
 )
 
-type ReferenceName string
-
 /**
   bare: 是否开启bare选项
   directory: 需要指定directory，明确把代码clone到哪里
@@ -44,7 +42,7 @@ func GitClone(directory, url, branch string) (*git.Repository, error) {
 			// },
 			Progress:      os.Stdout,
 			SingleBranch:  true,
-			ReferenceName: plumbing.ReferenceName(branch),
+			ReferenceName: plumbing.ReferenceName("refs/heads/" + branch),
 		})
 }
 
