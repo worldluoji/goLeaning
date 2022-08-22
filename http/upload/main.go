@@ -56,6 +56,7 @@ func main() {
 	serverMux := http.NewServeMux()
 	serverMux.HandleFunc("/upload", handler(uploadFileHandler, preChecker))
 	serverMux.HandleFunc("/view", viewHandler)
+	serverMux.Handle("/", shareServer(http.FileServer(http.Dir(uploadPath))))
 
 	log.Print("Server started on por 8080, use /upload for uploading files")
 	server := &http.Server{
@@ -151,4 +152,12 @@ func renderError(w http.ResponseWriter, message string, statusCode int) {
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("./template/upload.html")
 	t.Execute(w, templateParam)
+}
+
+func shareServer(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// 打印来源ip及访问的文件夹/文件
+		log.Printf("remote form ip:%s, uri: %s\n", r.RemoteAddr, r.RequestURI)
+		next.ServeHTTP(w, r)
+	})
 }
