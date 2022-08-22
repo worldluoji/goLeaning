@@ -7,11 +7,16 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	utils "fileupload/utils"
 )
 
 const (
 	maxUploadSize = 3 * 1024 * 2014 // 3 MB
-	uploadPath    = "D:\\temp"
+)
+
+var (
+	uploadPath string
 )
 
 type HTTPHandlerDecorator func(http.HandlerFunc) http.HandlerFunc
@@ -22,6 +27,15 @@ func handler(h http.HandlerFunc, decorators ...HTTPHandlerDecorator) http.Handle
 		h = d(h)
 	}
 	return h
+}
+
+// 优化点1，用viper将写死的路径写到配置文件中
+func init() {
+	if utils.IsWindows() {
+		uploadPath = "D:\\temp"
+	} else {
+		uploadPath = "/usr/cards"
+	}
 }
 
 func main() {
@@ -71,7 +85,7 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Get and print out file size
 	fileSize := fileHeader.Size
-	// log.Printf("File size (bytes): %v\n", fileSize)
+
 	// validate file size
 	if fileSize > maxUploadSize {
 		renderError(w, "FILE_TOO_BIG", http.StatusBadRequest)
@@ -86,7 +100,6 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 
 	// check file type, detectcontenttype only needs the first 512 bytes
 	detectedFileType := http.DetectContentType(fileBytes)
-	// log.Print("File type " + detectedFileType)
 	if detectedFileType != "application/x-gzip" {
 		renderError(w, "INVALID_FILE_TYPE", http.StatusBadRequest)
 		return
@@ -94,7 +107,6 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 
 	fileName := fileHeader.Filename
 	newPath := filepath.Join(uploadPath, fileName)
-	log.Printf("FileType: %s, File: %s\n", detectedFileType, newPath)
 
 	// write file
 	newFile, err := os.Create(newPath)
@@ -107,6 +119,13 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 		renderError(w, "CANT_WRITE_FILE", http.StatusInternalServerError)
 		return
 	}
+
+	if err := utils.DeCompress(newPath, uploadPath); err != nil {
+		log.Print(err)
+		renderError(w, "Decompress tar.gz failed", http.StatusInternalServerError)
+		return
+	}
+
 	w.Write([]byte("SUCCESS"))
 }
 
