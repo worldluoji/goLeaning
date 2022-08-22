@@ -1,5 +1,14 @@
 # README
 
+## run
+```
+go run main.go
+```
+
+## build
+go build
+
+## reference
 go标准库提供的上传下载API:
 ```
 const maxUploadSize = 2 * 1024 * 2014 // 2 MB 

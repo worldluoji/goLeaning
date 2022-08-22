@@ -13,7 +13,7 @@ import (
 
 const (
 	maxUploadSize = 3 * 1024 * 2014 // 3 MB
-	env           = "dev"           // 待优化点1： 环境信息通过pFlag参数传入
+	env           = "test"          // 待优化点1： 环境信息通过pFlag参数传入
 )
 
 type TemplateParam struct {
