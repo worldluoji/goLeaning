@@ -13,10 +13,16 @@ import (
 
 const (
 	maxUploadSize = 3 * 1024 * 2014 // 3 MB
+	env           = "dev"           // 待优化点1： 环境信息通过pFlag参数传入
 )
 
+type TemplateParam struct {
+	Host string
+}
+
 var (
-	uploadPath string
+	uploadPath    string
+	templateParam TemplateParam
 )
 
 type HTTPHandlerDecorator func(http.HandlerFunc) http.HandlerFunc
@@ -29,12 +35,20 @@ func handler(h http.HandlerFunc, decorators ...HTTPHandlerDecorator) http.Handle
 	return h
 }
 
-// 优化点1，用viper将写死的路径写到配置文件中
+// 待优化点2，用viper将写死的路径写到配置文件中
 func init() {
 	if utils.IsWindows() {
 		uploadPath = "D:\\temp"
 	} else {
 		uploadPath = "/usr/cards"
+	}
+
+	if env == "dev" {
+		templateParam.Host = "localhost"
+	} else if env == "test" {
+		templateParam.Host = "28.7.35.106"
+	} else {
+		// product 生产地址
 	}
 }
 
@@ -60,7 +74,7 @@ func preChecker(h http.HandlerFunc) http.HandlerFunc {
 		// 请求类型只能为POST
 		if r.Method != "POST" {
 			t, _ := template.ParseFiles("./template/upload.html")
-			t.Execute(w, nil)
+			t.Execute(w, templateParam)
 			return
 		}
 
@@ -136,5 +150,5 @@ func renderError(w http.ResponseWriter, message string, statusCode int) {
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	t, _ := template.ParseFiles("./template/upload.html")
-	t.Execute(w, nil)
+	t.Execute(w, templateParam)
 }
