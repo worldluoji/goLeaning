@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload File</title>
+</head>
+<body>
+    <div class="main">
+        <form enctype="multipart/form-data" action="http://localhost:8080/upload" method="post">
+            <input type="file" name="uploadFile" class="btn btn-theme"/>
+            <input type="submit" value="上传" class="btn btn-theme submit" />
+        </form>
+        <span class="note">只能上传.gz文件,且不超过3M</span>
+    </div>
+    <style>
+        .main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2%;
+        }
+
+        .btn-theme {
+            background-color: lightskyblue;
+            border-radius: 5px;
+            border: none;
+            padding: 5px;
+            font-size: 15px;
+            box-shadow: 1px 1px 3px;
+        }
+
+        .submit {
+            padding: 8px;
+            background-color:aquamarine;
+        }
+
+        .note {
+            margin-top: 1%;
+        }
+    </style>
+</body>
+</html>
