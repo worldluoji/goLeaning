@@ -8,36 +8,22 @@ import (
 )
 
 var (
-	mobile     bool
-	typescript bool
-	directory  string
-	url        string
-	branch     string
+	project   string
+	mobile    bool
+	directory string
+	url       string
+	branch    string
 )
 
 func init() {
-	rootCmd.Flags().StringVarP(&directory, "directory", "d", "", "拉取代码的本地保存目录，默认为当前目录")
-	rootCmd.Flags().StringVarP(&url, "url", "u", "", "github/gitlab仓库地址")
-	rootCmd.Flags().StringVarP(&branch, "branch", "b", "master", "分支名称")
+	rootCmd.Flags().StringVarP(&project, "project", "p", "", "项目名称")
+	rootCmd.Flags().StringVarP(&directory, "directory", "d", "", "拉取代码的本地保存目录，默认为当前目录 + 项目名称")
+	// 换成实际的url
+	rootCmd.Flags().StringVarP(&url, "url", "u", "https://gitee.com/ant-design/ant-design.git", "github/gitlab仓库地址")
+	rootCmd.Flags().StringVarP(&branch, "branch", "b", "", "分支名称")
+	rootCmd.Flags().BoolVarP(&mobile, "mobile", "m", false, "是否是移动端, 默认为false, 表示PC端")
 
-	rootCmd.Flags().BoolVarP(&mobile, "mobile", "m", false, "是否是移动端模板，默认为false, 表示PC端模板")
-	rootCmd.Flags().BoolVarP(&typescript, "typescript", "t", false, "是否使用typescript模板，默认为false, 表示使用JavaScript")
-	if url == "" {
-		// 换成实际的url
-		if mobile {
-			if typescript {
-				url = "https://gitee.com/ant-design/ant-design.git"
-			} else {
-				url = "https://gitee.com/ant-design/ant-design.git"
-			}
-		} else {
-			if typescript {
-				url = "https://gitee.com/ant-design/ant-design.git"
-			} else {
-				url = "https://gitee.com/ant-design/ant-design.git"
-			}
-		}
-	}
+	// TODO 根据m参数拉取不同的代码模板
 }
 
 var rootCmd = &cobra.Command{
@@ -45,7 +31,6 @@ var rootCmd = &cobra.Command{
 	Short: "Gittool is used for getting code from github",
 	Long:  `Gittool is used for getting code from github`,
 	Run: func(cmd *cobra.Command, args []string) {
-		// Do Stuff Here
 		fmt.Println("begin to get code...")
 		if _, err := GitClone(directory, url, branch); err != nil {
 			fmt.Println(err)
