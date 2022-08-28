@@ -19,23 +19,29 @@ var (
     remote    bool
 )
 
+// var cliName = viper.Get("cliName").(string)
+
 var createCmd = &cobra.Command{
 	Use:   "create",
-	Short: "create a new project with create command",
+	Short: `create a new project with create command,
+	      for example: ` + cliName + ` create -p demo
+	      see more, using command: ` + cliName + ` create -h`,
 	Long:  `create a new project with create command,for example:
-	` + viper.Get("cliName").(string) + " create demo",
+	       ` + cliName + " create -p demo",
 	Run: func(cmd *cobra.Command, args []string) {
 		var destPath string
 		if fileUtils.IsDir(project) {
 			destPath = project
+			fileUtils.MkDir(destPath)
 		} else {
 			destPath = fileUtils.GetCurrentJointDir(project)
+			fileUtils.MkDir(destPath)
 			if !fileUtils.IsDir(destPath) {
 				fmt.Println("dest path error....", destPath)
 				return
 			}
 		}
-		fileUtils.MkDir(destPath)
+		
 
 		if (!remote) {
 			var sourcePath string
@@ -44,7 +50,7 @@ var createCmd = &cobra.Command{
 			} else {
 				sourcePath = viper.Get("SourceTemplatePC").(string)
 			}
-			fmt.Println(sourcePath, destPath)
+			// fmt.Println(sourcePath, destPath)
 			fileUtils.CopyDir(sourcePath, destPath)
 			return
 		}
@@ -70,10 +76,10 @@ func init() {
 }
 
 func processFlags() {
-	createCmd.Flags().StringVarP(&project, "project", "p", "", "项目名称，可以是目录，默认为当前目录")
+	createCmd.Flags().StringVarP(&project, "project", "p", "", "项目名称，可以是目录，为必选项")
 	// 换成实际的url
 	createCmd.Flags().BoolVarP(&remote, "remote", "r", false, "是否从远程GitLab仓库拉取, 需要Gitlab仓库权限")
 	createCmd.Flags().BoolVarP(&mobile, "mobile", "m", false, "是否是移动端, 默认为false, 表示PC端")
-	rootCmd.MarkFlagRequired("project")
+	createCmd.MarkFlagRequired("project")
 	
 }

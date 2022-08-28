@@ -15,11 +15,13 @@ func init() {
 	rootCmd.AddCommand(versionCmd)
 }
 
+var cliName = viper.Get("cliName").(string)
+
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print the version number of GitTool",
-	Long:  `All software has versions. This is GitTool's`,
+	Short: "Print the version number of " + cliName,
+	Long:  `All software has versions. This is the version of` + cliName,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println(viper.Get("cliName"), " Vertion:", viper.Get("version"), " Author:", viper.Get("author"))
+		fmt.Println(cliName, " Vertion:", viper.Get("version"), " Author:", viper.Get("author"))
 	},
 }
