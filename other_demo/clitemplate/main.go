@@ -1,7 +1,7 @@
 package main
 
 import (
-	"gittool/cmd"
+	"clitemplate/cmd"
 )
 
 func main() {
