@@ -4,5 +4,3 @@ version: v1.0.0
 remoteAddr: https://github.com/worldluoji/delegation
 branchPC: master-pccli
 branchMobile: master-mobilecli
-SourceTemplateMobile: template/mobile
-SourceTemplatePC: template/pc

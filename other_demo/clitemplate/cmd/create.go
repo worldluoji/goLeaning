@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -44,9 +45,9 @@ var createCmd = &cobra.Command{
 		if !remote {
 			var sourcePath string
 			if mobile {
-				sourcePath = viper.Get("SourceTemplateMobile").(string)
+				sourcePath = filepath.Join("template", "mobile")
 			} else {
-				sourcePath = viper.Get("SourceTemplatePC").(string)
+				sourcePath = filepath.Join("template", "pc")
 			}
 			// fmt.Println(sourcePath, destPath)
 			if err := fileUtils.CopyDir(sourcePath, destPath); err != nil {
