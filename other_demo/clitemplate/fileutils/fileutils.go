@@ -77,6 +77,13 @@ func CopyDir(srcPath, desPath string) error {
 		return errors.New("源路径与目标路径不能相同！")
 	}
 
+	/** Wlak方法，从srcPath目录开始遍历，每一个子目录中的文件、文件夹都会遍历到，
+		 * func中，path就是具体文件或文件夹得路径，f是对应文件的信息
+		 The err argument reports an error related to path, signaling that Walk
+	     will not walk into that directory. The function can decide how to
+	     handle that error; as described earlier, returning the error will
+	     cause Walk to stop walking the entire tree.
+	*/
 	err := filepath.Walk(srcPath, func(path string, f os.FileInfo, err error) error {
 		if f == nil {
 			return err
