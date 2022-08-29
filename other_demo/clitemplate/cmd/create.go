@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	fileUtils "clitemplate/fileUtils"
-	gitOperation "clitemplate/gitOperation"
+	fileUtils "clitemplate/fileutils"
+	gitOperation "clitemplate/gitoperation"
 
 	_ "clitemplate/config"
 )
