@@ -6,27 +6,26 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	gitOperation "clitemplate/gitOperation"
 	fileUtils "clitemplate/fileUtils"
+	gitOperation "clitemplate/gitOperation"
 
 	_ "clitemplate/config"
 )
 
-
 var (
-	project   string
-	mobile    bool
-    remote    bool
+	project string
+	mobile  bool
+	remote  bool
 )
 
 // var cliName = viper.Get("cliName").(string)
 
 var createCmd = &cobra.Command{
-	Use:   "create",
+	Use: "create",
 	Short: `create a new project with create command,
 	      for example: ` + cliName + ` create -p demo
 	      see more, using command: ` + cliName + ` create -h`,
-	Long:  `create a new project with create command,for example:
+	Long: `create a new project with create command,for example:
 	       ` + cliName + " create -p demo",
 	Run: func(cmd *cobra.Command, args []string) {
 		var destPath string
@@ -41,17 +40,18 @@ var createCmd = &cobra.Command{
 				return
 			}
 		}
-		
 
-		if (!remote) {
+		if !remote {
 			var sourcePath string
-			if (mobile) {
+			if mobile {
 				sourcePath = viper.Get("SourceTemplateMobile").(string)
 			} else {
 				sourcePath = viper.Get("SourceTemplatePC").(string)
 			}
 			// fmt.Println(sourcePath, destPath)
-			fileUtils.CopyDir(sourcePath, destPath)
+			if err := fileUtils.CopyDir(sourcePath, destPath); err != nil {
+				fmt.Println("error", sourcePath, destPath, err)
+			}
 			return
 		}
 
@@ -81,5 +81,5 @@ func processFlags() {
 	createCmd.Flags().BoolVarP(&remote, "remote", "r", false, "是否从远程GitLab仓库拉取, 需要Gitlab仓库权限")
 	createCmd.Flags().BoolVarP(&mobile, "mobile", "m", false, "是否是移动端, 默认为false, 表示PC端")
 	createCmd.MarkFlagRequired("project")
-	
+
 }

@@ -10,17 +10,18 @@ import (
 	_ "clitemplate/config"
 )
 
+var cliName = viper.Get("cliName").(string)
+
 var rootCmd = &cobra.Command{
-	Use:   viper.Get("cliName").(string),
-	Short: "cliTemplate",
-	Long:  "cliTemplate -h",
+	Use:   cliName,
+	Short: cliName,
+	Long:  cliName,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			cmd.Help()
 		}
 	},
 }
-
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {

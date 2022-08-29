@@ -15,8 +15,6 @@ func init() {
 	rootCmd.AddCommand(versionCmd)
 }
 
-var cliName = viper.Get("cliName").(string)
-
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version number of " + cliName,

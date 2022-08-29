@@ -1,17 +1,30 @@
 package config
 
 import (
+	"bytes"
+	"embed"
 	"fmt"
 
 	"github.com/spf13/viper"
+
+	_ "embed"
 )
 
-func init() {
-	viper.AddConfigPath("./config")
-    viper.SetConfigType("yaml")
-	viper.SetConfigName("config")
+//go:embed configfile
+var configFiles embed.FS
 
-	if err := viper.ReadInConfig(); err != nil { // 读取配置文件。如果指定了配置文件名，则使用指定的配置文件，否则在注册的搜索路径中搜索
+func init() {
+
+	configBytes, err := configFiles.ReadFile("configfile/config.yaml")
+	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %s", err))
 	}
+	// fmt.Println(string(configBytes))
+	configReader := bytes.NewReader(configBytes)
+
+	viper.SetConfigType("yaml")
+	if err := viper.ReadConfig(configReader); err != nil {
+		panic(fmt.Errorf("fatal error config file: %s", err))
+	}
+
 }
