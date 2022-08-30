@@ -2,15 +2,15 @@ package cmd
 
 import (
 	"fmt"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	fileUtils "clitemplate/fileutils"
+	fileutils "clitemplate/fileutils"
 	gitOperation "clitemplate/gitoperation"
 
 	_ "clitemplate/config"
+	template "clitemplate/template"
 )
 
 var (
@@ -30,29 +30,24 @@ var createCmd = &cobra.Command{
 	       ` + cliName + " create -p demo",
 	Run: func(cmd *cobra.Command, args []string) {
 		var destPath string
-		if fileUtils.IsDir(project) {
+		if fileutils.IsDir(project) {
 			destPath = project
-			fileUtils.MkDir(destPath)
+			fileutils.MkDir(destPath)
 		} else {
-			destPath = fileUtils.GetCurrentJointDir(project)
-			fileUtils.MkDir(destPath)
-			if !fileUtils.IsDir(destPath) {
+			destPath = fileutils.GetCurrentJointDir(project)
+			fileutils.MkDir(destPath)
+			if !fileutils.IsDir(destPath) {
 				fmt.Println("dest path error....", destPath)
 				return
 			}
 		}
 
 		if !remote {
-			var sourcePath string
-			if mobile {
-				sourcePath = filepath.Join("template", "mobile")
-			} else {
-				sourcePath = filepath.Join("template", "pc")
+			if err := template.CopyEmbededFiles(mobile, destPath); err != nil {
+				fmt.Println("copy error....", err)
+				return
 			}
-			// fmt.Println(sourcePath, destPath)
-			if err := fileUtils.CopyDir(sourcePath, destPath); err != nil {
-				fmt.Println("error", sourcePath, destPath, err)
-			}
+
 			return
 		}
 

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -115,4 +116,22 @@ func GetCurrentJointDir(name string) string {
 	current, _ := os.Getwd()
 	current = filepath.Join(current, name)
 	return current
+}
+
+func CopyFileFS(srcFile fs.File, des string) (written int64, err error) {
+	defer srcFile.Close()
+
+	//获取源文件的权限
+	fi, _ := srcFile.Stat()
+	perm := fi.Mode()
+
+	//desFile, err := os.Create(des)  //无法复制源文件的所有权限
+	desFile, err := os.OpenFile(des, os.O_RDWR|os.O_CREATE|os.O_TRUNC, perm) //复制源文件的所有权限
+	if err != nil {
+		return 0, err
+	}
+	defer desFile.Close()
+
+	return io.Copy(desFile, srcFile)
+
 }
