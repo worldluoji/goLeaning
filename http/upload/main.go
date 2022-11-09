@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -8,13 +9,26 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
+
 	utils "fileupload/utils"
 )
 
-const (
-	maxUploadSize = 3 * 1024 * 2014 // 3 MB
-	env           = "test"          // 待优化点1： 环境信息通过pFlag参数传入
+// 给变量赋值
+var (
+	env           string
+	maxUploadSize int64
+	help          = pflag.BoolP("help", "h", false, "查看命令帮助")
 )
+
+func init() {
+	pflag.StringVarP(&env, "env", "e", "test", "启动环境,可取值:dev、test、production")
+	pflag.Int64VarP(&maxUploadSize, "maxSzie", "m", 3, "上传文件大小限制,单位为MB")
+	pflag.Parse()
+	maxUploadSize = maxUploadSize * 1024 * 1024
+	// log.Println("pflag", env, maxUploadSize)
+}
 
 type TemplateParam struct {
 	Host string
@@ -22,8 +36,24 @@ type TemplateParam struct {
 
 var (
 	uploadPath    string
+	port          string
 	templateParam TemplateParam
 )
+
+func init() {
+	viper.AddConfigPath("./config")      // 把当前目录加入到配置文件的搜索路径中
+	viper.SetConfigName("config_" + env) // 配置文件名称（没有文件扩展名）
+	viper.SetConfigType("yaml")          // 如果配置文件名中没有文件扩展名，则需要指定配置文件的格式，告诉viper以何种格式解析文件
+
+	if err := viper.ReadInConfig(); err != nil { // 读取配置文件。如果指定了配置文件名，则使用指定的配置文件，否则在注册的搜索路径中搜索
+		panic(fmt.Errorf("fatal error config file: %s", err))
+	}
+
+	uploadPath = viper.Get("uploadPath").(string)
+	port = viper.Get("port").(string)
+	templateParam.Host = viper.Get("host").(string)
+	// log.Println("viper", uploadPath, templateParam.Host, port)
+}
 
 type HTTPHandlerDecorator func(http.HandlerFunc) http.HandlerFunc
 
@@ -35,32 +65,19 @@ func handler(h http.HandlerFunc, decorators ...HTTPHandlerDecorator) http.Handle
 	return h
 }
 
-// 待优化点2，用viper将写死的路径写到配置文件中
-func init() {
-	if utils.IsWindows() {
-		uploadPath = "D:\\temp"
-	} else {
-		uploadPath = "/usr/cards"
-	}
-
-	if env == "dev" {
-		templateParam.Host = "localhost"
-	} else if env == "test" {
-		templateParam.Host = "28.7.35.106"
-	} else {
-		// product 生产地址
-	}
-}
-
 func main() {
+	if *help {
+		pflag.Usage()
+		return
+	}
+
 	serverMux := http.NewServeMux()
 	serverMux.HandleFunc("/upload", handler(uploadFileHandler, preChecker))
-	serverMux.HandleFunc("/view", viewHandler)
 	serverMux.Handle("/", shareServer(http.FileServer(http.Dir(uploadPath))))
 
-	log.Print("Server started on por 8080, use /upload for uploading files")
+	log.Printf("Server started on port %s, use /upload for uploading files", port)
 	server := &http.Server{
-		Addr:    ":8080",
+		Addr:    ":" + port,
 		Handler: serverMux,
 	}
 
@@ -147,11 +164,6 @@ func uploadFileHandler(w http.ResponseWriter, r *http.Request) {
 func renderError(w http.ResponseWriter, message string, statusCode int) {
 	w.WriteHeader(http.StatusBadRequest)
 	w.Write([]byte(message))
-}
-
-func viewHandler(w http.ResponseWriter, r *http.Request) {
-	t, _ := template.ParseFiles("./template/upload.html")
-	t.Execute(w, templateParam)
 }
 
 func shareServer(next http.Handler) http.Handler {

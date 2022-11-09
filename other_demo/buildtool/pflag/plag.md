@@ -36,15 +36,25 @@ type Value interface {
 <br>
 
 ### Pflag 支持以下 4 种命令行参数定义方式
-- 支持长选项、默认值和使用文本，并将标志的值存储在指针中。<br>
-  var name = pflag.String("name", "colin", "Input Your Name")
-- 支持长选项、短选项、默认值和使用文本，并将标志的值存储在指针中。<br>
-  var name = pflag.StringP("name", "n", "colin", "Input Your Name")
-- 支持长选项、默认值和使用文本，并将标志的值绑定到变量。<br>
-  var name stringpflag.StringVar(&name, "name", "colin", "Input Your Name")
-- 支持长选项、短选项、默认值和使用文本，并将标志的值绑定到变量。<br>
-  var name stringpflag.StringVarP(&name, "name", "n","colin", "Input Your Name")
-<br>
+支持长选项、默认值和使用文本，并将标志的值存储在指针中。
+```
+var name = pflag.String("name", "colin", "Input Your Name")
+```
+支持长选项、短选项、默认值和使用文本，并将标志的值存储在指针中。
+```
+var name = pflag.StringP("name", "n", "colin", "Input Your Name")
+```
+支持长选项、默认值和使用文本，并将标志的值绑定到变量。
+```
+var name string
+pflag.StringVar(&name, "name", "colin", "Input Your Name")
+```
+支持长选项、短选项、默认值和使用文本，并将标志的值绑定到变量
+```
+var name string
+pflag.StringVarP(&name, "name", "n","colin", "Input Your Name")
+```
+
 规则：
 - 函数名带Var说明是将标志的值绑定到变量，否则是将标志的值存储在指针中。
 - 函数名带P说明支持短选项，否则不支持短选项。
