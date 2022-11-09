@@ -79,6 +79,8 @@ ROUTINE ======================== github.com/bigwhite/tcp-server-demo2/packet.Dec
 $ go test -race -cover  -coverprofile=./coverage.out -timeout=10m -short -v ./...
 $ go tool cover -func ./coverage.out
 
+注意：go test -v xxx_test.go 才能输出 t.Log 里的文字
+
 5. 常用mock工具：
 1）golang/mock，是官方提供的 Mock 框架。它实现了基于 interface 的 Mock 功能，
 能够与 Golang 内置的 testing 包做很好的集成，是最常用的 Mock 工具。
