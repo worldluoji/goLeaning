@@ -53,10 +53,11 @@ func add(a []int, val int) {
 
 func TestSliceAppend3(t *testing.T) {
 	a := make([]int, 3)
+	t.Log(len(a), cap(a))
 	a = append(a, 3, 4, 5)
-	t.Log(a)
+	t.Log(a, len(a), cap(a))
 	add(a, 8)
-	t.Log(a)
+	t.Log(a, len(a), cap(a))
 }
 
 func TestSortIntSlice(t *testing.T) {
