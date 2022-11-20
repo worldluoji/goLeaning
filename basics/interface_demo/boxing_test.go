@@ -10,7 +10,9 @@ type TS struct {
 	s string
 }
 
-func (TS) M1() {}
+func (TS) M1() {
+	fmt.Println("Do M1 func...")
+}
 func (TS) M2() {}
 
 type NonEmptyInterface interface {
@@ -28,12 +30,12 @@ func TestBoxing(t *testing.T) {
 		n: 17,
 		s: "hello, interface",
 	}
-	var ei interface{}
-	ei = ts //装箱
+	var ei interface{} = ts //装箱
 
-	var i NonEmptyInterface
-	i = ts //装箱
+	var i NonEmptyInterface = ts //装箱
 	fmt.Println(ei)
 	fmt.Println(i)
 	fmt.Println(ei == i)
+
+	i.M1()
 }

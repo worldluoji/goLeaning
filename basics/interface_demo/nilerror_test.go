@@ -100,7 +100,7 @@ func printNonEmptyInterface() {
 	var err2 error   // 非空接口类型
 	err1 = (*T)(nil) // 针对这种赋值，println 输出的 err1 是（0x10ed120, 0x0），也就是非空接口类型变量的类型信息并不为空，数据指针为空，因此它与 nil（0x0,0x0）之间不能划等号
 	println("err1:", err1)
-	println("err1 = nil:", err1 == nil)
+	// println("err1 = nil:", err1 == nil)
 
 	err1 = T(5)
 	err2 = T(6)
