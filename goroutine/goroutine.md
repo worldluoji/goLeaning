@@ -1,4 +1,5 @@
-1. Goroutine的调度
+# Goroutinue
+## 1. Goroutine的调度
 Goroutine 占用的资源非常小，每个 Goroutine 栈的大小默认是 2KB。
 而且，Goroutine 调度的切换也不用陷入（trap）操作系统内核层完成，代价很低。
 
@@ -15,8 +16,11 @@ Go 程序是用户层程序，它本身就是整体运行在一个或多个操�
 所以这个答案就出来了：Goroutine 们要竞争的“CPU”资源就是操作系统线程。
 这样，Goroutine 调度器的任务也就明确了：将 Goroutine 按照一定算法放到不同的操作系统线程中去执行。
 
-2. Goroutine调度模型
+## 2. Goroutine调度模型
 Goroutine使用GMP模型
+
+<img src="Goroutine调度原理.webp" />
+
 G:  代表 Goroutine，存储了 Goroutine 的执行栈信息、Goroutine 状态以及 Goroutine 的任务函数等，
 而且 G 对象是可以重用的；
 
@@ -33,7 +37,7 @@ P 是一个“逻辑 Proccessor”，每个 G（Goroutine）要想真正运行�
 可以说：在 G 的眼里只有 P。
 但从 Go 调度器的视角来看，真正的“CPU”是 M，只有将 P 和 M 绑定，才能让 P 的 runq 中的 G 真正运行起来。
 
-3. 演进
+## 3. 演进
 
 G-P-M 模型的实现算是Go调度器的一大进步，但调度器仍然有一个令人头疼的问题，那就是不支持抢占式调度，
 这导致一旦某个 G 中出现死循环的代码逻辑，那么 G 将永久占用分配给它的 P 和 M，
@@ -68,10 +72,12 @@ Go 运行时已经实现了 netpoller，这使得即便 G 发起网络 I/O 操�
 但对于 Go 调度器而言，这也算是一个不小的进步了
 
 
-问题：
+## 问题
 1）在一个拥有多核处理器的主机上，使用 Go 1.13.x 版本运行这个示例代码，你在命令行终端上是否能看到“I got scheduled!”输出呢？
 也就是 main goroutine 在创建 deadloop goroutine 之后是否能继续得到调度呢？
+
 2）我们通过什么方法可以让上面示例中的 main goroutine，在创建 deadloop goroutine 之后无法继续得到调度？
+```
 func deadloop() {
     for {
     } 
@@ -84,10 +90,12 @@ func main() {
         fmt.Println("I got scheduled!")
     }
 }
-
+```
 go1.13的话加上runtime.GOMAXPROCS(1) （即只设置1个P），
 main goroutine在创建 deadloop goroutine 之后就无法继续得到调度。
+
 但如果是go1.14之后的话即使加上runtime.GOMAXPROCS(1) main goroutine在创建 deadloop goroutine 之后
 还是可以得到调度，应该是因为增加了对非协作的抢占式调度的支持。
 
-参考资料：https://time.geekbang.org/column/article/476643
+## 参考资料
+https://time.geekbang.org/column/article/476643
