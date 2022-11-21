@@ -82,10 +82,11 @@ func TestChangeString(t *testing.T) {
 
 func TestStringToMap(t *testing.T) {
 	ss := "weitong"
-	mp := map[uint8]int{}
-	for _, s := range ss {
-		t.Log(s)
-		mp[uint8(s)]++
+	mp := map[rune]int{}
+	// range时value为rune
+	for index, s := range ss {
+		t.Log(index, s)
+		mp[s]++
 	}
 	for k, v := range mp {
 		t.Log(k, v)
@@ -93,10 +94,17 @@ func TestStringToMap(t *testing.T) {
 
 	t.Log(ss[0:2], len(ss[0:0]), nil)
 	t.Logf("%T", ss[0:2])
-	res := findNthDigit(100)
+	res := findNthDigit(12)
 	t.Log(res)
 }
 
+func TestStringBuilder(t *testing.T) {
+	t.Log(findNthDigit(11))
+	t.Log(findNthDigit(12))
+	t.Log(findNthDigit(100))
+}
+
+// 1,2,3,4,5,6,7,8,9,10,11... 第11个数是0，12个是1
 func findNthDigit(n int) int {
 	var ss strings.Builder
 	for num := 1; ; num++ {
