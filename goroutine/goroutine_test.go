@@ -28,8 +28,8 @@ func TestGoroutineCase2(t *testing.T) {
 	for i := 0; i < 6; i++ {
 		wg.Add(1)
 		go func(num int) {
+			t.Logf("开始发送第%d个元素\n", num)
 			ch <- num
-			t.Logf("发送第%d个元素\n", num)
 		}(i)
 	}
 
