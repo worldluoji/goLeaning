@@ -104,3 +104,30 @@ func TestStructCombine(t *testing.T) {
 	fmt.Println(*(s.MyInt)) // 22
 	fmt.Println(s.a)
 }
+
+type P struct {
+	a int
+}
+
+func (t P) M1() {
+	t.a = 10
+}
+
+func (t *P) M2() {
+	t.a = 11
+}
+
+// 对比receiver的两种情况
+// 我们可以得到选择 receiver 参数类型的第一个原则：如果 Go 方法要把对 receiver 参数代表的类型实例的修改，反映到原类型实例上，那么应该选择指针 *P 作为 receiver 参数的类型
+// Go 方法调用时，receiver 参数是以值拷贝的形式传入方法中的。那么，如果 receiver 参数类型的 size 较大，以值拷贝形式传入就会导致较大的性能开销，这时我们选择 *T 作为 receiver 类型可能更好些。
+func TestReceiver(t *testing.T) {
+	p1 := P{a: 0}
+	t.Log(p1.a) // 0
+
+	p1.M1()
+	t.Log(p1.a) // 0
+
+	p2 := &P{a: 0}
+	p2.M2()
+	t.Log(p2.a) // 11
+}
