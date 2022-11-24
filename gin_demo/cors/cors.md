@@ -148,7 +148,8 @@ Keep-Alive: timeout=2, max=100
 Connection: Keep-Alive
 Content-Type: text/plain
 ```
-上面的HTTP回应中，关键的是Access-Control-Allow-Origin字段，表示http://api.bob.com可以请求数据。该字段也可以设为星号，表示同意任意跨源请求。字段说明如下：
+上面的HTTP回应中，关键的是Access-Control-Allow-Origin字段，表示 http://api.bob.com 可以请求数据。
+该字段也可以设为星号，表示同意任意跨源请求。字段说明如下：
 
 1. Access-Control-Allow-Origin
 
