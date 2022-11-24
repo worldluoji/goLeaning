@@ -21,7 +21,7 @@ func (p *Product) TableName() string {
 }
 
 var (
-	host     = pflag.StringP("host", "H", "127.0.0.1:3306", "MySQL service host address")
+	host     = pflag.StringP("host", "H", "127.0.0.1:3309", "MariaDB service host address")
 	username = pflag.StringP("username", "u", "root", "Username for access to mysql service")
 	password = pflag.StringP("password", "p", "root", "Password for access to mysql, should be used pair with password")
 	database = pflag.StringP("database", "d", "test", "Database name to use")
