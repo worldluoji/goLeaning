@@ -31,7 +31,7 @@ func newProductHandler() *productHandler {
 	}
 }
 
-// curl -X POST -H 'Content-Type: application/json' -d '{"username":"luoji","name":"mate50","category":"mobile","price":5000,"description":"Greate Mobile"}' http://localhost:8098/v1/products
+// curl -X POST -H 'Content-Type: application/json' -d '{"username":"luoji","name":"mate50","category":"mobile","price":5000,"description":"Great Mobile"}' http://localhost:8098/v1/products
 func (u *productHandler) Create(c *gin.Context) {
 	// 	log.Println(c.GetHeader("Content-Type"))  -> would print application/json
 	u.Lock()
