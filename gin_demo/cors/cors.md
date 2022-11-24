@@ -7,7 +7,7 @@
 - CORS 普通跨域请求：只服务端设置Access-Control-Allow-Origin即可，
 前端无须设置，若要带cookie请求：前后端都需要设置。    
 - JSONP 缺点：只能使用get 请求
-- document.domain 仅限主域相同，子域不同的跨域应用场景。
+- document.domain 仅限主域相同，子域不同的跨域应用场景。 MDN文档已经说明其已弃用，不再推荐使用该特性。
 
 ## 跨域资源共享CORS
 - CORS是一个W3C标准，全称是"跨域资源共享"（Cross-origin resource sharing）。
@@ -19,7 +19,7 @@
 浏览器将CORS请求分成两类：简单请求（simple request）和非简单请求（not-so-simple request）
 
 ### 简单请求
-简单请求满足一下两个条件：
+简单请求满足以下两个条件：
 ```
 1. 请求方法是以下三种方法之一：
         HEAD
@@ -91,7 +91,8 @@ xhr.withCredentials = true;
 ```
 xhr.withCredentials = false;
 ```
-需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传，且（跨源）原网页代码中的document.cookie也无法读取服务器域名下的Cookie。
+需要注意的是，如果要发送Cookie，Access-Control-Allow-Origin就不能设为星号，必须指定明确的、与请求网页一致的域名。
+同时，Cookie依然遵循同源政策，只有用服务器域名设置的Cookie才会上传，其他域名的Cookie并不会上传，且（跨源）原网页代码中的document.cookie也无法读取服务器域名下的Cookie。
 
 ## 非简单请求
 - 非简单请求是那种对服务器有特殊要求的请求，比如请求方法是PUT或DELETE，或者Content-Type字段的类型是application/json。
@@ -120,7 +121,7 @@ Accept-Language: en-US
 Connection: keep-alive
 User-Agent: Mozilla/5.0...
 ```
-- "预检"请求用的请求方法是OPTIONS，表示这个请求是用来询问的。
+- "预检"请求用的请求方法是<strong>OPTIONS</strong>，表示这个请求是用来询问的。
 - 头信息里面，关键字段是Origin，表示请求来自哪个源。
 - 除了Origin字段，"预检"请求的头信息包括两个特殊字段
 ```
@@ -151,20 +152,20 @@ Content-Type: text/plain
 
 1. Access-Control-Allow-Origin
 
- 首先，客户端请求时要带上一个Origin，用来说明，本次请求来自哪个源（协议 + 域名 + 端口）。服务器根据这个值，决定是否同意这次请求。然后服务端在返回时需要带上这个字段，并把对方传过来的值返回去。告知客户端，允许这次请求。
- 这个字段也可以设置为*，即允许所有客户端访问。但是这样做会和Access-Control-Allow-Credentials 起冲突。可能导致跨域请求失败。
+首先，客户端请求时要带上一个Origin，用来说明，本次请求来自哪个源（协议 + 域名 + 端口）。服务器根据这个值，决定是否同意这次请求。然后服务端在返回时需要带上这个字段，并把对方传过来的值返回去。告知客户端，允许这次请求。
+这个字段也可以设置为*，即允许所有客户端访问。但是这样做会和Access-Control-Allow-Credentials 起冲突。可能导致跨域请求失败。
 
 2. Access-Control-Allow-Credentials
 
- 这个字段是一个BOOL值，可以允许客户端携带一些校验信息，比如cookie等。如果设置为Access-Control-Allow-Origin：*，而该字段是true，并且客户端开启了withCredentials, 仍然不能正确访问。需要把Access-Control-Allow-Origin的值设置为客户端传过来的值。
+这个字段是一个BOOL值，可以允许客户端携带一些校验信息，比如cookie等。
+如果设置为Access-Control-Allow-Origin：*，而该字段是true，并且客户端开启了withCredentials, 仍然不能正确访问。需要把Access-Control-Allow-Origin的值设置为客户端传过来的值。
 
-3. Access-Control-Allow-Credentials
+该字段与简单请求时的含义相同。
 
- 该字段与简单请求时的含义相同。
+3. Access-Control-Max-Age
 
-4. Access-Control-Max-Age
+该字段可选，用来指定本次预检请求的有效期，单位为秒。上面结果中，有效期是20天（1728000秒），即允许缓存该条回应1728000秒（即20天），在此期间，不用发出另一条预检请求。
 
- 该字段可选，用来指定本次预检请求的有效期，单位为秒。上面结果中，有效期是20天（1728000秒），即允许缓存该条回应1728000秒（即20天），在此期间，不用发出另一条预检请求。
-
- ### 浏览器的正常请求和回应
- 一旦服务器通过了"预检"请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。
+### 浏览器的正常请求和回应
+一旦服务器通过了"预检"请求，以后每次浏览器正常的CORS请求，就都跟简单请求一样，会有一个Origin头信息字段。
+服务器的回应，也都会有一个Access-Control-Allow-Origin头信息字段。
