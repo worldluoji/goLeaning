@@ -25,7 +25,7 @@ func Logger() gin.HandlerFunc {
 		latency := time.Since(t)
 		log.Println("after request", latency)
 
-		// 访问我们发送的状态
+		// 访问我们发送的状态, 200, 404等等
 		status := c.Writer.Status()
 		log.Println("status", status)
 	}
