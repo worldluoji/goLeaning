@@ -117,3 +117,24 @@ func TestGeneric5(t *testing.T) {
 	foo[int](5, s) //ok
 	foo[int](5, s) //ok
 }
+
+// 定义 泛型 maxableSlice[T ordered]类型 为结构体
+type maxableSlice[T ordered] struct {
+	elems []T
+}
+
+func TestGeneric6(t *testing.T) {
+	var sl = maxableSlice[int]{
+		elems: []int{1, 2, -4, -6, 7, 0},
+	}
+	t.Log(sl.elems)
+
+	// 范型类型，暂无法进行类型推导
+	// var sl2 = maxableSlice {
+	// 	elems: []int{1, 2, -4, -6, 7, 0}, // 编译器错误：cannot use generic type maxableSlice[T ordered] without instantiation
+	// }
+
+	// 泛型类型只有实例化后才能得到一个真实类型
+	// type msa1 = maxableSlice[T ordered] 错误
+	type msa2 = maxableSlice[int] // ok
+}
