@@ -104,6 +104,13 @@ func ReadAll(r io.Reader) ([]byte, error)                 // 正确的作法
 - 不支持变长的类型参数（type parameters）
 ......
 
+receiver也不能再泛化：
+```
+func (f *foo[T]) M1[E any](e E) T { // 编译器错误：syntax error: method must have no type parameters
+    //... ...
+}
+```
+
 https://github.com/golang/proposal/blob/master/design/43651-type-parameters.md#omissions
 
 这些特性如今不支持，后续大概率也不会支持。
