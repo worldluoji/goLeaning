@@ -95,3 +95,15 @@ func ReadAll(r io.Reader) ([]byte, error)                 // 正确的作法
 
 3. 如果你发现自己多次编写完全相同的代码（样板代码），各个版本之间唯一的差别是代码使用不同的类型，那就请你考虑是否可以使用类型参数。
 反之，在你注意到自己要多次编写完全相同的代码之前，应该避免使用类型参数。
+
+
+## Go 泛型设计方案已经明确不支持的若干特性
+- 不支持泛型特（specialization），即不支持编写一个泛型函数针对某个具体类型的特殊版本；
+- 不支持元编程（metaprogramming），即不支持编写在编译时执行的代码来生成在运行时执行的代码；
+- 不支持操作符方法（operator method），即只能用普通的方法（method）操作类型实例（比如：getIndex(k)），而不能将操作符视为方法并自定义其实现，比如一个容器类型的下标访问 c[k]；
+- 不支持变长的类型参数（type parameters）
+......
+
+https://github.com/golang/proposal/blob/master/design/43651-type-parameters.md#omissions
+
+这些特性如今不支持，后续大概率也不会支持。
