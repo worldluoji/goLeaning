@@ -103,3 +103,17 @@ func TestGeneric4(t *testing.T) {
 	fmt.Println(maxGenerics([]int8{1, 2, -4, -6, 7, 0}))                     // 输出：7
 	fmt.Println(maxGenerics([]myString{"11", "22", "44", "66", "77", "10"})) // 输出：77
 }
+
+// comparable是golang新引入的预定义标识符，是一个接口，指代可以使用==或!=来进行比较的类型集合。
+// comparable仅能用于泛型中的类型限定（type constraint）。
+func foo[T comparable, E any](a int, s E) {
+	fmt.Println(a, s)
+}
+
+func TestGeneric5(t *testing.T) {
+	// 类型实参自动推断有一个前提，你一定要记牢，那就是它必须是函数的参数列表中使用了的类型形参
+	// foo(5, "hello") // 编译器错误：cannot infer T
+	var s = "hello"
+	foo[int](5, s) //ok
+	foo[int](5, s) //ok
+}
