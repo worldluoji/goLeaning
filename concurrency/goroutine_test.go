@@ -1,4 +1,4 @@
-package goroutine
+package concurrency
 
 import (
 	"fmt"

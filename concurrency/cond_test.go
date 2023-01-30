@@ -1,4 +1,4 @@
-package other_demo
+package concurrency
 
 import (
 	"fmt"
