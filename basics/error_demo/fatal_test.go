@@ -1,4 +1,4 @@
-package other_demo
+package error_demo
 
 import (
 	"log"
@@ -13,6 +13,7 @@ func fatal() {
 	log.Fatal("fatal")
 }
 
+// log.Fatal执行后，defer将不会执行
 func TestFatal(t *testing.T) {
 	defer func() {
 		log.Println("defer")
