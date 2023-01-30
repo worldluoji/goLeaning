@@ -1,10 +1,11 @@
-package main
+package profiling
 
 import (
 	"flag"
 	"log"
 	"os"
 	"runtime/pprof"
+	"testing"
 )
 
 /*
@@ -44,7 +45,7 @@ func init() {
 * go run .\profiling.go --good=false
 * go run .\profiling.go
  */
-func main() {
+func TestProfiling(t *testing.T) {
 	// 通过调用 flag.Parse() 来对命令行参数进行解析
 	flag.Parse()
 	log.Println(*cpuprofile)
