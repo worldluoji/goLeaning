@@ -22,3 +22,8 @@ export GOSUMDB=off # 关闭校验 Go 依赖包的哈希值
 EOF
 
 source $HOME/.bashrc
+
+
+阿里云代码配置：
+go env -w GOPROXY=https://mirrors.aliyun.com/goproxy/ // Windows
+export GOPROXY=https://mirrors.aliyun.com/goproxy/ // macOS 或 Linux
