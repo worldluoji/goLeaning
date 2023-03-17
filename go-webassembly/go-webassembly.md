@@ -26,6 +26,17 @@ http-server -p 3009
 ```
 Then visit http://localhost:3009/index.html
 
+## Executing WebAssembly with Node.js
+First, make sure Node is installed and in your PATH.
+
+then add $(go env GOROOT)/misc/wasm to your PATH
+```
+export PATH="$PATH:$(go env GOROOT)/misc/wasm"
+```
+This will allow go run and go test find go_js_wasm_exec in a `PATH search and use it to just work for js/wasm.
+```
+GOOS=js GOARCH=wasm go run .
+```
 
 ## reference
 https://github.com/golang/go/wiki/WebAssembly#getting-started
