@@ -38,5 +38,39 @@ This will allow go run and go test find go_js_wasm_exec in a `PATH search and us
 GOOS=js GOARCH=wasm go run .
 ```
 
+go_js_wasm_exec is a wrapper that allows running Go Wasm binaries in Node. 
+By default, it may be found in the misc/wasm directory of your Go installation.
+
+If you’d rather not add anything to your PATH, you may also set the -exec flag to the location of go_js_wasm_exec 
+when you execute go run or go test manually.
+```
+$ GOOS=js GOARCH=wasm go run -exec="$(go env GOROOT)/misc/wasm/go_js_wasm_exec" .
+Hello, WebAssembly!
+
+$ GOOS=js GOARCH=wasm go test -exec="$(go env GOROOT)/misc/wasm/go_js_wasm_exec"
+PASS
+ok  	example.org/my/pkg	0.800s
+
+$(go env GOROOT)/misc/wasm/go_js_wasm_exec ./main.wasm
+Hello, WebAssembly!
+```
+
+## Running tests in the browser
+```
+go install github.com/agnivade/wasmbrowsertest@latest
+
+// $GOPATH is $(go env GOPATH)
+
+$ mv $GOPATH/bin/wasmbrowsertest $GOPATH/bin/go_js_wasm_exec
+$ export PATH="$PATH:$GOPATH/bin"
+$ GOOS=js GOARCH=wasm go test
+PASS
+ok  	example.org/my/pkg	0.800s
+```
+It automates the job of spinning up a webserver and uses headless Chrome to run the tests inside it 
+and relays the logs to your console.
+
+<br>
+
 ## reference
 https://github.com/golang/go/wiki/WebAssembly#getting-started
