@@ -11,10 +11,10 @@ func TestWaitGroupCase1(t *testing.T) {
 
 	ch := make(chan int, 3)
 	for i := 0; i < 6; i++ {
-		go func(num int, wg *sync.WaitGroup) {
+		wg.Add(1)
+		go func(num int) {
 			ch <- num
-			wg.Add(1)
-		}(i, &wg)
+		}(i)
 	}
 	for i := 0; i < 6; i++ {
 		go func(i int, wg *sync.WaitGroup) {
@@ -27,7 +27,6 @@ func TestWaitGroupCase1(t *testing.T) {
 }
 
 func SimpleProducer(ch chan<- int, count int, wg *sync.WaitGroup) {
-	// wg.Add(1)
 	for i := 0; i < count; i++ {
 		ch <- i
 	}
@@ -36,7 +35,6 @@ func SimpleProducer(ch chan<- int, count int, wg *sync.WaitGroup) {
 }
 
 func SimpleReceiver(ch <-chan int, count int, wg *sync.WaitGroup) {
-	// wg.Add(1)
 	for i := 0; i < count; i++ {
 		if o, ok := <-ch; ok {
 			fmt.Printf("收到的第%d个元素为%d\n", i, o)
