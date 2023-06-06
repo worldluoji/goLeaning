@@ -12,13 +12,8 @@ import (
 //go:embed pc
 var templates embed.FS
 
-func CopyEmbededFiles(mobile bool, dest string) error {
-	var src string
-	if mobile {
-		src = "mobile"
-	} else {
-		src = "pc"
-	}
+func CopyEmbededFiles(dest string) error {
+	var src = "pc"
 	if err := fileutils.MkDir(dest); err != nil {
 		return err
 	}
