@@ -10,16 +10,11 @@ import (
 	gitOperation "clitemplate/gitoperation"
 
 	_ "clitemplate/config"
-	template "clitemplate/template"
 )
 
 var (
 	project string
-	mobile  bool
-	remote  bool
 )
-
-// var cliName = viper.Get("cliName").(string)
 
 var createCmd = &cobra.Command{
 	Use: "create",
@@ -42,22 +37,18 @@ var createCmd = &cobra.Command{
 			}
 		}
 
-		if !remote {
-			if err := template.CopyEmbededFiles(mobile, destPath); err != nil {
-				fmt.Println("copy error....", err)
-				return
-			}
+		// if !remote {
+		// 	if err := template.CopyEmbededFiles(mobile, destPath); err != nil {
+		// 		fmt.Println("copy error....", err)
+		// 		return
+		// 	}
 
-			return
-		}
+		// 	return
+		// }
 
 		remoteAddr := viper.Get("remoteAddr").(string)
-		var branch string
-		if mobile {
-			branch = viper.Get("branchPC").(string)
-		} else {
-			branch = viper.Get("branchMobile").(string)
-		}
+		var branch = viper.Get("branch").(string)
+
 		fmt.Println("begin to get code from gitlab...")
 		if _, err := gitOperation.GitClone(destPath, remoteAddr, branch); err != nil {
 			fmt.Println(err)
@@ -73,9 +64,5 @@ func init() {
 
 func processFlags() {
 	createCmd.Flags().StringVarP(&project, "project", "p", "", "项目名称，可以是目录，为必选项")
-	// 换成实际的url
-	createCmd.Flags().BoolVarP(&remote, "remote", "r", false, "是否从远程GitLab仓库拉取, 需要Gitlab仓库权限")
-	createCmd.Flags().BoolVarP(&mobile, "mobile", "m", false, "是否是移动端, 默认为false, 表示PC端")
 	createCmd.MarkFlagRequired("project")
-
 }

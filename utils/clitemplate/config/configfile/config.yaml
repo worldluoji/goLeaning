@@ -2,5 +2,4 @@ cliName: cliTemplate
 author: luoji
 version: v1.0.0
 remoteAddr: https://github.com/worldluoji/delegation
-branchPC: master-pccli
-branchMobile: master-mobilecli
+branch: master
