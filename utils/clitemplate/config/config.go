@@ -15,7 +15,7 @@ var configFiles embed.FS
 
 func init() {
 
-	configBytes, err := configFiles.ReadFile("configfile/config.yaml")
+	configBytes, err := configFiles.ReadFile("./config.yaml")
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %s", err))
 	}
