@@ -1,11 +1,13 @@
 package localcopyworker
 
 import (
-	fileutils "clitemplate/utils/fileutils"
 	"embed"
 	"fmt"
 	"io/fs"
 	"path/filepath"
+
+	colorUtils "clitemplate/utils/colorUtils"
+	fileutils "clitemplate/utils/fileutils"
 )
 
 //go:embed pc
@@ -52,12 +54,12 @@ type LocalCopyWorker struct {
 }
 
 func (worker *LocalCopyWorker) Do(dest string) bool {
-	fmt.Println("Begin to copy template...")
+	fmt.Println(colorUtils.White("Begin to copy template..."))
 	if err := CopyEmbededFiles(dest); err != nil {
-		fmt.Println("copy template error....", err)
+		fmt.Println(colorUtils.Red("copy template error...."), err)
 		return false
 	}
 
-	fmt.Println("Copy template successed!!!")
+	fmt.Println(colorUtils.Green("Copy template successed!!!"))
 	return true
 }

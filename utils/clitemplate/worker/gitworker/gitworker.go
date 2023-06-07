@@ -7,6 +7,8 @@ import (
 
 	git "gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+
+	colorUtils "clitemplate/utils/colorUtils"
 )
 
 /**
@@ -32,7 +34,7 @@ func GitClone(dest, url, branch string) (*git.Repository, error) {
 		cloneDir = dest
 	}
 
-	fmt.Println("git clone", url, cloneDir, branch)
+	// fmt.Println("git clone", url, cloneDir, branch)
 	return git.PlainClone(cloneDir, false,
 		&git.CloneOptions{
 			URL: url,
@@ -61,11 +63,11 @@ type GitWorker struct {
 }
 
 func (worker *GitWorker) Do(dest string) bool {
-	fmt.Println("Begin to get template from gitlab...")
+	fmt.Println(colorUtils.White("Begin to get template from gitlab..."))
 	if _, err := GitClone(dest, worker.Url, worker.Branch); err != nil {
-		fmt.Println("Get template from gitlab failed ", err)
+		fmt.Println(colorUtils.Red("Get template from gitlab failed "), err)
 		return false
 	}
-	fmt.Println("Get template from gitlab successed!!!")
+	fmt.Println(colorUtils.Green("Get template from gitlab successed!!!"))
 	return true
 }
