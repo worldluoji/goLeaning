@@ -113,6 +113,7 @@ func CopyDir(srcPath, desPath string) error {
 }
 
 func GetCurrentJointDir(name string) string {
+	// os.Getwd()这个方法获取的是进程在OS系统所在的目录
 	current, _ := os.Getwd()
 	current = filepath.Join(current, name)
 	return current
@@ -134,4 +135,20 @@ func CopyFileFS(srcFile fs.File, des string) (written int64, err error) {
 
 	return io.Copy(desFile, srcFile)
 
+}
+
+func GetDestPath(project string) string {
+	var destPath string
+	if IsDir(project) {
+		destPath = project
+		MkDir(destPath)
+	} else {
+		destPath = GetCurrentJointDir(project)
+		MkDir(destPath)
+		if !IsDir(destPath) {
+			fmt.Println("dest path error....", destPath)
+			return ""
+		}
+	}
+	return destPath
 }

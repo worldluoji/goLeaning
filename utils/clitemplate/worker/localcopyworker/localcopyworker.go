@@ -49,12 +49,11 @@ func copy(src, dest string) error {
 }
 
 type LocalCopyWorker struct {
-	Dest string
 }
 
-func (worker *LocalCopyWorker) Do() bool {
+func (worker *LocalCopyWorker) Do(dest string) bool {
 	fmt.Println("Begin to copy template...")
-	if err := CopyEmbededFiles(worker.Dest); err != nil {
+	if err := CopyEmbededFiles(dest); err != nil {
 		fmt.Println("copy template error....", err)
 		return false
 	}

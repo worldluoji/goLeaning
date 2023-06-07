@@ -1,5 +1,5 @@
-package Worker
+package worker
 
 type Worker interface {
-	Do() bool
+	Do(dest string) bool
 }

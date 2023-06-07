@@ -60,9 +60,9 @@ type GitWorker struct {
 	Branch string
 }
 
-func (worker *GitWorker) Do() bool {
+func (worker *GitWorker) Do(dest string) bool {
 	fmt.Println("Begin to get template from gitlab...")
-	if _, err := GitClone(worker.Dest, worker.Url, worker.Branch); err != nil {
+	if _, err := GitClone(dest, worker.Url, worker.Branch); err != nil {
 		fmt.Println("Get template from gitlab failed ", err)
 		return false
 	}
