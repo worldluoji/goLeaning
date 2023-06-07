@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 )
 
-//go:embed mobile
 //go:embed pc
 var templates embed.FS
 

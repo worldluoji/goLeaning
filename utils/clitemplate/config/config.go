@@ -10,12 +10,12 @@ import (
 	_ "embed"
 )
 
-//go:embed configfile
+//go:embed configYaml
 var configFiles embed.FS
 
 func init() {
 
-	configBytes, err := configFiles.ReadFile("./config.yaml")
+	configBytes, err := configFiles.ReadFile("configYaml/config.yaml")
 	if err != nil {
 		panic(fmt.Errorf("fatal error config file: %s", err))
 	}
