@@ -1,4 +1,4 @@
-package gitoperation
+package gitworker
 
 import (
 	"errors"
@@ -11,25 +11,25 @@ import (
 
 /**
   bare: 是否开启bare选项
-  directory: 需要指定directory，明确把代码clone到哪里
+  dest: 需要指定directory，明确把代码clone到哪里
   url: 要clone的repo url
   referenceName: 可以是分支名称，也可以是tag，也可以是commit id
   auth: 这个是可选的，就要看你有没有授权校验
 */
-func GitClone(directory, url, branch string) (*git.Repository, error) {
+func GitClone(dest, url, branch string) (*git.Repository, error) {
 	if url == "" {
 		return nil, errors.New("git url can not be null")
 	}
 
 	var cloneDir string
-	if directory == "" {
+	if dest == "" {
 		if dir, err := getWorkDir(); err != nil {
 			return nil, err
 		} else {
 			cloneDir = dir
 		}
 	} else {
-		cloneDir = directory
+		cloneDir = dest
 	}
 
 	fmt.Println("git clone", url, cloneDir, branch)
@@ -52,4 +52,20 @@ func getWorkDir() (string, error) {
 	} else {
 		return str, nil
 	}
+}
+
+type GitWorker struct {
+	Dest   string
+	Url    string
+	Branch string
+}
+
+func (worker *GitWorker) Do() bool {
+	fmt.Println("Begin to get template from gitlab...")
+	if _, err := GitClone(worker.Dest, worker.Url, worker.Branch); err != nil {
+		fmt.Println("Get template from gitlab failed ", err)
+		return false
+	}
+	fmt.Println("Get template from gitlab successed!!!")
+	return true
 }

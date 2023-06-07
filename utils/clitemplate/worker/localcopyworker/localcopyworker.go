@@ -1,7 +1,7 @@
-package template
+package localcopyworker
 
 import (
-	fileutils "clitemplate/fileutils"
+	fileutils "clitemplate/utils/fileutils"
 	"embed"
 	"fmt"
 	"io/fs"
@@ -46,4 +46,19 @@ func copy(src, dest string) error {
 		}
 	}
 	return nil
+}
+
+type LocalCopyWorker struct {
+	Dest string
+}
+
+func (worker *LocalCopyWorker) Do() bool {
+	fmt.Println("Begin to copy template...")
+	if err := CopyEmbededFiles(worker.Dest); err != nil {
+		fmt.Println("copy template error....", err)
+		return false
+	}
+
+	fmt.Println("Copy template successed!!!")
+	return true
 }

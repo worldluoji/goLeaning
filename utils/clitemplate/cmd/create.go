@@ -6,10 +6,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	fileutils "clitemplate/fileutils"
-	gitOperation "clitemplate/gitoperation"
+	fileutils "clitemplate/utils/fileutils"
 
 	_ "clitemplate/config"
+
+	gitworker "clitemplate/worker/gitworker"
 )
 
 var (
@@ -37,23 +38,13 @@ var createCmd = &cobra.Command{
 			}
 		}
 
-		// if !remote {
-		// 	if err := template.CopyEmbededFiles(mobile, destPath); err != nil {
-		// 		fmt.Println("copy error....", err)
-		// 		return
-		// 	}
-
-		// 	return
-		// }
-
-		remoteAddr := viper.Get("remoteAddr").(string)
-		var branch = viper.Get("branch").(string)
-
-		fmt.Println("begin to get code from gitlab...")
-		if _, err := gitOperation.GitClone(destPath, remoteAddr, branch); err != nil {
-			fmt.Println(err)
+		woker := &gitworker.GitWorker{
+			Dest:   destPath,
+			Url:    viper.Get("remoteAddr").(string),
+			Branch: viper.Get("branch").(string),
 		}
-		fmt.Println("get code from gitlab finished...")
+
+		woker.Do()
 	},
 }
 
