@@ -1,0 +1,23 @@
+package concurrency
+
+import (
+	"fmt"
+	"sync"
+	"testing"
+)
+
+func TestOnce(t *testing.T) {
+	var once sync.Once
+
+	// 第一个初始化函数
+	f1 := func() {
+		fmt.Println("in f1")
+	}
+	once.Do(f1) // 打印出 in f1
+
+	// 第二个初始化函数
+	f2 := func() {
+		fmt.Println("in f2")
+	}
+	once.Do(f2) // 无输出
+}
