@@ -40,7 +40,7 @@ func GitClone(dest, url, branch string) (*git.Repository, error) {
 			URL: url,
 			// Auth: &http.BasicAuth{
 			// 	Username: "worldluoji",
-			// 	Password: "Mldncsdn3",
+			// 	Password: "xxxxxxxx",
 			// },
 			Progress:      os.Stdout,
 			SingleBranch:  true,
