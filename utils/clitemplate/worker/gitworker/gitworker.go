@@ -63,11 +63,11 @@ type GitWorker struct {
 }
 
 func (worker *GitWorker) Do(dest string) bool {
-	fmt.Println(colorUtils.White("Begin to get template from gitlab..."))
+	fmt.Println(colorUtils.White("Begin to get template from remote..."))
 	if _, err := GitClone(dest, worker.Url, worker.Branch); err != nil {
-		fmt.Println(colorUtils.Red("Get template from gitlab failed "), err)
+		fmt.Println(colorUtils.Red("Get template from remote failed "), err)
 		return false
 	}
-	fmt.Println(colorUtils.Green("Get template from gitlab successed!!!"))
+	fmt.Println(colorUtils.Green("Get template from remote successed!!!"))
 	return true
 }
