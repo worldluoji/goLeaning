@@ -1,9 +1,12 @@
 package concurrency
 
 import (
+	"fmt"
+	"math/rand"
 	"sync"
 	"sync/atomic"
 	"testing"
+	"time"
 )
 
 /*
@@ -69,4 +72,45 @@ func BenchmarkReadSyncByRWMutex(b *testing.B) {
 			readSyncByRWMutex()
 		}
 	})
+}
+
+type Config struct {
+	NodeName string
+	Addr     string
+	Count    int32
+}
+
+func loadNewConfig() Config {
+	return Config{
+		NodeName: "Chengdu",
+		Addr:     "1.2.3.4",
+		Count:    rand.Int31(),
+	}
+}
+
+func TestAtomicValue(t *testing.T) {
+	var config atomic.Value
+	config.Store(loadNewConfig())
+	var cond = sync.NewCond(&sync.Mutex{})
+
+	// 设置新的config
+	go func() {
+		for {
+			time.Sleep(time.Duration(5+rand.Int63n(5)) * time.Second)
+			config.Store(loadNewConfig())
+			cond.Broadcast() // 通知等待着配置已变更
+		}
+	}()
+
+	go func() {
+		for {
+			cond.L.Lock()
+			cond.Wait()                 // 等待变更信号
+			c := config.Load().(Config) // 读取新的配置
+			fmt.Printf("new config: %+v\n", c)
+			cond.L.Unlock()
+		}
+	}()
+
+	select {}
 }
