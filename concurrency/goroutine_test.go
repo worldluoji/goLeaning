@@ -2,6 +2,7 @@ package concurrency
 
 import (
 	"fmt"
+	"reflect"
 	"sync"
 	"testing"
 	"time"
@@ -273,4 +274,54 @@ func TestNilChannel2(t *testing.T) {
 func TestEmptyChannel(t *testing.T) {
 	var sem chan struct{}
 	t.Log(sem == nil, len(sem))
+}
+
+func TestProcessMutiChan(t *testing.T) {
+	var ch1 = make(chan int, 10)
+	var ch2 = make(chan int, 10)
+
+	// 创建SelectCase
+	var cases = createCases(ch1, ch2)
+
+	// 执行10次select, 第一次肯定是 send case，因为此时 chan 还没有元素，recv 还不可用。等 chan 中有了数据以后，recv case 就可以被选择了。这样，你就可以处理不定数量的 chan 了
+	for i := 0; i < 10; i++ {
+		chosen, recv, ok := reflect.Select(cases)
+		if recv.IsValid() { // recv case
+			fmt.Println("recv:", cases[chosen].Dir, recv, ok)
+		} else { // send case
+			fmt.Println("send:", cases[chosen].Dir, ok)
+		}
+	}
+}
+
+/**
+* createCases 函数分别为每个 chan 生成了 recv case 和 send case，并返回一个 reflect.SelectCase 数组
+* reflect.Select函数接收selectCase列表作为参数，直到列表中某个case发生才返回
+* Go 的 select 是伪随机的，它可以在执行的 case 中随机选择一个 case，并把选择的这个 case 的索引（chosen）返回，如果没有可用的 case 返回，会返回一个 bool 类型的返回值，
+* 这个返回值用来表示是否有 case 成功被选择。
+* 如果是 recv case，还会返回接收的元素。
+* func Select(cases []SelectCase) (chosen int, recv Value, recvOK bool)
+**/
+func createCases(chs ...chan int) []reflect.SelectCase {
+	var cases []reflect.SelectCase
+
+	// 创建recv case
+	for _, ch := range chs {
+		cases = append(cases, reflect.SelectCase{
+			Dir:  reflect.SelectRecv,
+			Chan: reflect.ValueOf(ch),
+		})
+	}
+
+	// 创建send case
+	for i, ch := range chs {
+		v := reflect.ValueOf(i)
+		cases = append(cases, reflect.SelectCase{
+			Dir:  reflect.SelectSend,  // direction of case
+			Chan: reflect.ValueOf(ch), // channel to use (for send or receive)
+			Send: v,                   // value to send (for send)
+		})
+	}
+
+	return cases
 }
