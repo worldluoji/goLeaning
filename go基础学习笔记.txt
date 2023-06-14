@@ -230,102 +230,8 @@ Go1.4以后采用连续动态栈，即在连续内存中表示一个栈。 连�
 这部分数据地址也会随之改变。
 所以，不要在Go中长期保存一个地址并使用它。
 
-20. channel
-1）理解channel
-Go 程序员中有句格言：不要以共享内存方式通信，要以通信方式共享内存（Don’t communicate by sharing memory, share memory by communicating）
-Go中推荐使用channel来进行goroutine之间的通信
-你可以简单地把 Go 实现的 CSP 模型类比为生产者 - 消费者模式，而 channel 可以类比为生产者 - 消费者模式中的阻塞队列。
-不过，需要注意的是 Go 中 channel 的容量可以是 0，容量为 0 的 channel 在 Go 中被称为无缓冲的 channel，
-容量大于 0 的则被称为有缓冲的 channel。
 
-针对 channel ch 的类型不同，len(ch) 有如下两种语义：
-当 ch 为无缓冲 channel 时，len(ch) 总是返回 0；
-当 ch 为带缓冲 channel 时，len(ch) 返回当前 channel ch 中尚未被读取的元素个数。
-而cap(ch)返回的是信道的容量
-
-channel 原语用于多个 Goroutine 间的通信，一旦多个 Goroutine 共同对 channel 进行收发操作，
-len(channel) 就会在多个 Goroutine 间形成“竞态”。
-单纯地依靠 len(channel) 来判断 channel 中元素状态，是不能保证在后续对 channel 的收发时 channel 状态是不变的。
-
-但两种场景可以使用：
-一个是“多发送单接收”的场景，也就是有多个发送者，但有且只有一个接收者。在这样的场景下，
-我们可以在接收 goroutine 中使用len(channel)是否大于0来判断是否 channel 中有数据需要接收。
-另一个是“多接收单发送”的场景，也就是有多个接收者，但有且只有一个发送者。在这样的场景下，
-我们可以在发送 Goroutine 中使用len(channel)是否小于cap(channel)来判断是否可以执行向 channel 的发送操作。
-
-2) channel的使用
-创建一个可以传递bool类型值的无法缓冲channel：var ch = make(chan bool)
-发送 : ch<-true 将true写入channel
-接收 : v := <-ch 
-无缓冲的channel发送操作总是在接收操作之前完成
-无缓冲channel必须收发配对，否则信道将阻塞，发生死锁。就像快递一样，快递员<->用户。
-无缓冲信道收和发都会发生阻塞。
-
-指定第二个参数则定义有缓冲信道：
-var ch = make(chan bool, 3) 这样就定义了一个缓存大小为3的channel.
-则有cap(ch) = 3
-当缓存满的情况下，才会阻塞向channel中发送数据；同样，只有缓存为空时才会阻塞从channel中接收数据
-在容量为C的channel上的第k个接收先行发生于从这个channel上的第k+C次发送完成.
-（举个例子，容量为3，那么发的第1个包，一定比第4个早发送完成，但不保证第1个包和第2个包谁先谁后）
-可以通过带缓冲的channel来实现计数信号量：channel中的元素数量对应着活动的数量，
-channel的容量表示同时活动的最大数量，发送元素获取信号量，接收元素释放信号量，这是限制并发的通常用法。
-var limit = make(chan int, 3)
-func main() {
-    for _, w := range work {   
-         go func(w func()) {
-            limit <- 1
-            w()
-            <-limit
-        }(w)
-    }
-    select{}
-}
-这些goroutine通过有限制的channel来确保最多同时执行三个工作函数（w）
-更建议使用sync.WaitGroup
-
-唯送信道： ch := make(chan<-int) 即只能往信道中发送数据
-唯收信道： ch := make(<-chan int) 即只能从信道中读取数据
-tips:看<-在chan的左边还是右边，在左边就是唯收，右边就是唯送
-意义：函数的入参定义，可以限制唯送或者唯收，但是传入的实际变量可以是双向的
-
-close(ch)关闭一个信道。
-for x := range ch接收信道数时，遇到信道关闭，接收方仍然可以从信道中取到数据，读取完后会退出循环。
-如果信道中没有数据，也没有关闭信道则会阻塞。
-向关闭的信道发送数据会导致panic
-v,ok := <-ch 可以用第二个参数ok判断信道是否已经关闭，ok为false说明信道已经关闭
-
-nil channel
-如果一个 channel 类型变量的值为 nil，我们称它为 nil channel。
-nil channel 有一个特性，那就是对 nil channel 的读写都会发生阻塞。
-
-func main() {
-	var c chan int
-	<-c //阻塞
-}
-
-或者：
-
-func main() {
-	var c chan int
-	c<-1  //阻塞
-}
-
-
-21. sync.WaitGroup的使用
-var wg sync.WaitGroup
-wg.Add(2) 添加或减少等待的goroutine数量
-wg.Done() 相当于wg.Add(-1)
-wg.Wait() 直到goroutine数量变为0，否则一直阻塞
-
-22. Go语言中也有类似Java中的锁
-互斥锁： var mu sync.Mutex
-mu.Lock() .... mu.UnLock()
-读写锁：var rw sync.RWMutex   
-rw.Lock()/rw.UnLock()就是写锁，上了写锁，读写都是互斥的
-rw.RLock()/rw.RUnLock()就是读锁，读锁读不互斥，写互斥
-读多写少的时候读写锁效率会比较高。
-
-什么时候使用同步原语？
+20. 什么时候使用同步原语？
 一般情况下，我建议你优先使用 CSP 并发模型进行并发程序设计。
 但是在下面一些场景中，我们依然需要 sync 包提供的低级同步原语：
 1）无论是在单 Goroutine 情况下，还是在并发测试情况下，sync.Mutex实现的同步机制的性能，都要比 channel 实现的高出三倍多。
@@ -382,16 +288,3 @@ import _ "foo"
 那么空导入的意义是什么呢？由于依赖foo包，程序初始化的时候会沿着包的依赖链初始化foo包，
 包的初始化会按照常量->变量->init函数的次序进行。
 通常实践中空导入意味着期望依赖包的init函数得到执行，这个init函数中有我们需要的逻辑。
-
-29. sync.Cond
-sync.Cond是传统的条件变量原语概念在 Go 语言中的实现。
-我们可以把一个条件变量理解为一个容器，这个容器中存放着一个或一组等待着某个条件成立的 Goroutine。
-当条件成立后，这些处于等待状态的 Goroutine 将得到通知，并被唤醒继续进行后续的工作。
-sync.Cond为 Goroutine 在这个场景下提供了另一种可选的、资源消耗更小、使用体验更佳的同步方式。
-详细见cond_test.go
-
-30. atomic
-atomic 包封装了 CPU 实现的部分原子操作指令，为用户层提供体验良好的原子操作函数，
-因此 atomic 包中提供的原语更接近硬件底层，也更为低级，它也常被用于实现更为高级的并发同步技术，
-比如 channel 和 sync 包中的同步原语。
-详细见atomic_test.go
