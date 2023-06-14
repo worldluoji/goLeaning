@@ -11,9 +11,11 @@ import (
 	"time"
 )
 
-// go test -v .\goroutine_test.go -run TestCachedGoroutine
-// 1. 有缓冲channel，channel最多只能有C个元素，超过了入队就会阻塞
-func TestCachedGoroutine(t *testing.T) {
+/**
+* 1. 数据交流, 讲有缓冲信道用作一个buffer 或者 queue。有缓冲channel，channel最多只能有C个元素，超过了入队就会阻塞
+* go test -v .\goroutine_test.go -run TestCachedGoroutine
+* */
+func TestCachedChannel(t *testing.T) {
 	start := time.Now()
 	ch := make(chan int, 2)
 	var wg sync.WaitGroup
@@ -37,7 +39,9 @@ func TestCachedGoroutine(t *testing.T) {
 	t.Log("耗时时间为：", elapse)
 }
 
-// 2. 无缓冲channel的接收先行发生于发送完成
+/**
+* 2. 无缓冲channel的接收先行发生于发送完成
+**/
 var cht = make(chan int)
 var a string
 
@@ -53,7 +57,9 @@ func TestNoCacheChannel(t *testing.T) {
 	fmt.Println(a)
 }
 
-// 3. 对channel的关闭先行发生于接收到值，因为channel已经被关闭了
+/**
+* 3. 对channel的关闭先行发生于接收到值，因为channel已经被关闭了
+**/
 func setVal2() {
 	a = "hello golang2"
 	close(cht)
@@ -125,6 +131,9 @@ func TestSelectHeartBeat(t *testing.T) {
 	}
 }
 
+/**
+* 5. 通过channel实现pipline, 实际就是用channel将结果连接起来, 从而实现数据传递
+**/
 func echo(nums []int) <-chan int {
 	out := make(chan int)
 	go func() {
@@ -161,7 +170,6 @@ func odd(in <-chan int) <-chan int {
 	return out
 }
 
-// pipeline实际就是用channel将结果连接起来
 func TestPipeline1(t *testing.T) {
 	nums := []int{1, 2, 3, 4, 5, 6}
 	// in fact , it is a pipeline
@@ -189,6 +197,9 @@ func TestPipeline2(t *testing.T) {
 	}
 }
 
+/**
+* 6. nil channel问题
+**/
 func TestNilChannel(t *testing.T) {
 	ch1, ch2 := make(chan int), make(chan int)
 	go func() {
@@ -267,6 +278,7 @@ func TestEmptyChannel(t *testing.T) {
 	t.Log(sem == nil, len(sem))
 }
 
+// 7. 使用reflect.Select解决多个信道select case的问题
 func TestProcessMutiChan(t *testing.T) {
 	var ch1 = make(chan int, 10)
 	var ch2 = make(chan int, 10)
@@ -317,8 +329,10 @@ func createCases(chs ...chan int) []reflect.SelectCase {
 	return cases
 }
 
-// 信号通知，优雅退出
-// go test -v ./goroutine_test.go -run TestNotify
+/**
+* 8. 信号通知，优雅退出
+* go test -v ./goroutine_test.go -run TestNotify
+**/
 func TestNotify(t *testing.T) {
 	var closing = make(chan struct{})
 	var closed = make(chan struct{})
@@ -357,4 +371,72 @@ func doCleanup(closed chan struct{}) {
 	time.Sleep(20 * time.Second)
 	// close一定发生在接受前，所以退出前doCleanup一定执行过了。
 	close(closed)
+}
+
+/**
+* 9. 通过channel实现锁
+* 要想使用 chan 实现互斥锁，至少有两种方式。一种方式是先初始化一个 capacity 等于 1 的 Channel，然后再放入一个元素。
+* 这个元素就代表锁，谁取得了这个元素，就相当于获取了这把锁。
+* 另一种方式是，先初始化一个 capacity 等于 1 的 Channel，它的“空槽”代表锁，谁能成功地把元素发送到这个 Channel，谁就获取了这把锁
+**/
+
+// 使用chan实现互斥锁
+type Mutex struct {
+	ch chan struct{}
+}
+
+// 使用锁需要初始化
+func NewMutex() *Mutex {
+	mu := &Mutex{make(chan struct{}, 1)}
+	mu.ch <- struct{}{}
+	return mu
+}
+
+// 请求锁，直到获取到
+func (m *Mutex) Lock() {
+	<-m.ch
+}
+
+// 解锁
+func (m *Mutex) Unlock() {
+	select {
+	case m.ch <- struct{}{}:
+	default:
+		panic("unlock of unlocked mutex")
+	}
+}
+
+// 尝试获取锁
+func (m *Mutex) TryLock() bool {
+	select {
+	case <-m.ch:
+		return true
+	default:
+	}
+	return false
+}
+
+// 加入一个超时的设置
+func (m *Mutex) LockTimeout(timeout time.Duration) bool {
+	timer := time.NewTimer(timeout)
+	select {
+	case <-m.ch:
+		timer.Stop()
+		return true
+	case <-timer.C:
+	}
+	return false
+}
+
+// 锁是否已被持有
+func (m *Mutex) IsLocked() bool {
+	return len(m.ch) == 0
+}
+
+func TestChannelMutex(t *testing.T) {
+	m := NewMutex()
+	ok := m.TryLock()
+	fmt.Printf("locked v %v\n", ok)
+	ok = m.TryLock()
+	fmt.Printf("locked %v\n", ok)
 }
