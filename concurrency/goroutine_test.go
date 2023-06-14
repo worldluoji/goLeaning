@@ -2,27 +2,18 @@ package concurrency
 
 import (
 	"fmt"
+	"os"
+	sg "os/signal"
 	"reflect"
 	"sync"
+	"syscall"
 	"testing"
 	"time"
 )
 
-func hello(msg string) {
-	fmt.Println("Hello " + msg)
-}
-
-// go test -v .\goroutine_test.go -run TestGoroutineCase1
-func TestGoroutineCase1(t *testing.T) {
-	//在新的协程中执行hello方法
-	go hello("World")
-	//等待100毫秒让协程执行结束, 否则可能退出后，goroutine还没有结束
-	time.Sleep(100 * time.Millisecond)
-}
-
-// 在容量为C的channel上的第k个接收先行发生于从这个channel上的第k+C次发送完成。
-// 可以理解为， channel最多只能有C个元素，超过了入队就会阻塞
-func TestGoroutineCase2(t *testing.T) {
+// go test -v .\goroutine_test.go -run TestCachedGoroutine
+// 1. 有缓冲channel，channel最多只能有C个元素，超过了入队就会阻塞
+func TestCachedGoroutine(t *testing.T) {
 	start := time.Now()
 	ch := make(chan int, 2)
 	var wg sync.WaitGroup
@@ -46,6 +37,7 @@ func TestGoroutineCase2(t *testing.T) {
 	t.Log("耗时时间为：", elapse)
 }
 
+// 2. 无缓冲channel的接收先行发生于发送完成
 var cht = make(chan int)
 var a string
 
@@ -54,29 +46,28 @@ func setVal() {
 	cht <- 9
 }
 
-func TestGoroutineCase3(t *testing.T) {
+func TestNoCacheChannel(t *testing.T) {
 	go setVal()
 	<-cht
 	// 无缓冲channel的接收先行发生于发送完成，因此能正确打印出hello golang
 	fmt.Println(a)
 }
 
+// 3. 对channel的关闭先行发生于接收到值，因为channel已经被关闭了
 func setVal2() {
 	a = "hello golang2"
 	close(cht)
 }
 
-// 对channel的关闭先行发生于接收到值，因为channel已经被关闭了
-func TestGoroutineCase4(t *testing.T) {
+func TestCloseChannel(t *testing.T) {
 	go setVal2()
 	<-cht
 	fmt.Println(a)
 }
 
-/*
-* 当多个协程同时运行时，可通过 select 轮询多个通道
-• 如多个通道就绪则随机选择一个
-*/
+/**
+* 4. 当多个协程同时运行时，可通过 select 轮询多个通道，如多个通道就绪则随机选择一个
+**/
 func TestSelectChannelCase(t *testing.T) {
 	ch := make(chan string, 1)
 	ch2 := make(chan string, 1)
@@ -324,4 +315,46 @@ func createCases(chs ...chan int) []reflect.SelectCase {
 	}
 
 	return cases
+}
+
+// 信号通知，优雅退出
+// go test -v ./goroutine_test.go -run TestNotify
+func TestNotify(t *testing.T) {
+	var closing = make(chan struct{})
+	var closed = make(chan struct{})
+
+	go func() {
+		// 模拟业务处理
+		for {
+			select {
+			case <-closing:
+				return
+			default:
+				// ....... 业务计算
+				time.Sleep(100 * time.Millisecond)
+			}
+		}
+	}()
+
+	// 处理CTRL+C等中断信号
+	termChan := make(chan os.Signal)
+	sg.Notify(termChan, syscall.SIGINT, syscall.SIGTERM)
+	<-termChan
+
+	close(closing)
+	// 执行退出之前的清理动作
+	go doCleanup(closed)
+
+	select {
+	case <-closed:
+	case <-time.After(time.Second):
+		fmt.Println("清理超时，不等了")
+	}
+	fmt.Println("优雅退出")
+}
+
+func doCleanup(closed chan struct{}) {
+	time.Sleep(20 * time.Second)
+	// close一定发生在接受前，所以退出前doCleanup一定执行过了。
+	close(closed)
 }
