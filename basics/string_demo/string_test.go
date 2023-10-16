@@ -9,10 +9,13 @@ import (
 func TestStringIterator(t *testing.T) {
 	ss := "武汉加油加油！！！"
 	t.Log(len(ss), len([]rune(ss)))
-	// for range遍历字符串就是rune，如果是传统for循环，i++;ss[i]的模式就是字节
+	// for range遍历字符串就是rune，如果是传统for循环，i++;ss[i]的模式就是byte
 	for _, s := range ss {
 		t.Logf("%[1]c %[1]x", s)
 	}
+
+	t.Logf("%[1]d %[1]T", ss[0])
+	t.Log(uint8('a'))
 }
 
 /* 可见遍历时，会自动转化为rune, UTF8字符
