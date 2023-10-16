@@ -49,6 +49,35 @@ string、切片、map 这些类型，作为函数入参时，传递的是其引�
 
 变长参数实际上是通过切片来实现的，可以通过打印看到其类型。
 
+需要注意的是：切片传值操作，append未触发扩容，会同时修改底层数组的值，但不会影响原切片的长度和容量；
+当触发扩容，那么会产生副本，后面的修改则会和原底层数组剥离开，互不影响。
+如果期望在修改切片后，对原切片也发生修改，则可以使用传址操作，始终基于同一个切片变量进行操作。
+
+示例：将一颗二叉树的叶子结点的值放到nodeVals数组中返回：
+```
+func bfsLeafNodeVals(node *TreeNode, nodeVals *[]int) {
+    queue := []*TreeNode{node}
+    for ;; {
+        if len(queue) == 0 {
+            break
+        }
+        var v = queue[0]
+        queue = queue[1:]
+        if (v.Left == nil) && (v.Right == nil) {
+            *nodeVals = append(*nodeVals, v.Val)
+            continue
+        }
+        if v.Left != nil {
+            queue = append([]*TreeNode{v.Left}, queue...)
+        }
+
+        if v.Right != nil {
+            queue = append([]*TreeNode{v.Right}, queue...)
+        }
+    }
+}
+```
+
 4. map的声明和使用
 m := map[string]int{"one": 1, "two": 2, "three": 3} 
 m1 := map[string]int{} 
