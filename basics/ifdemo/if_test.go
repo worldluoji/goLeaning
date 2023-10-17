@@ -2,14 +2,6 @@ package ifdemo
 
 import "testing"
 
-func TestIfCase(t *testing.T) {
-	for i := 0; i < 5; i++ {
-		if j := 3 * i; j%2 == 0 {
-			t.Log(i)
-		}
-	}
-}
-
 func TestIfCase2(t *testing.T) {
 	var f interface{}
 	f = 3.25
