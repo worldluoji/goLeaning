@@ -78,29 +78,6 @@ func TestSortStringSlice(t *testing.T) {
 	t.Log("逆序排序：", sl)
 }
 
-func changeSlice(a []int, i int, newVal int) {
-	a[i] = newVal
-}
-
-func changeArray(a [3]int, i int, newVal int) {
-	a[i] = newVal
-}
-
-/*
-	数组传入函数是副本，切片则是对应的地址
-*/
-func TestChangeArray(t *testing.T) {
-	a := []int{1, 2, 3}
-	changeSlice(a, 0, 6)
-	fmt.Println(a)
-
-	b := [3]int{1, 2, 3}
-	changeArray(b, 0, 6)
-	fmt.Println(b)
-
-	fmt.Println(b[3:])
-}
-
 func TestArrayEqual(t *testing.T) {
 	a := [3]int{1, 2, 3}
 	b := [3]int{1, 2, 3}
