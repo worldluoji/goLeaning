@@ -40,3 +40,8 @@ func Fields(s string) []string // 返回将字符串按照空白（通过unicode
 func Split(s, sep string) []string // 用去掉s中出现的sep的方式进行分割，会分割到结尾，并返回生成的所有片段组成的切片
 func Join(a []string, sep string) string // 将一系列字符串连接为一个字符串，之间用sep来分隔
 ```
+
+## 字符串比较
+```
+strings.Compare(str1, str2)
+```
