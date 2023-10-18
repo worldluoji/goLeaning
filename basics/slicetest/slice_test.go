@@ -247,3 +247,17 @@ func TestTwoDimArraySort(t *testing.T) {
 	t.Log("是否从小到大排序：", lowToHitghsorted)
 
 }
+
+func TestSortString(t *testing.T) {
+	var words = []string{"wo", "worl", "world", "w", "wor"}
+	sort.Strings(words)
+	t.Log(words)
+
+	var word = "dcba"
+	b := []byte(word)
+	sort.Slice(b, func(i, j int) bool {
+		return b[i] < b[j]
+	})
+	word = string(b)
+	t.Log(word)
+}
